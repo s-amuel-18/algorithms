@@ -34,10 +34,21 @@ class Student {
      * - Valida que studentId sea un string no vacío (después de trim)
      * - Lanza error "Student ID is required" si el ID es inválido
      * - Asigna los valores validados a this.name y this.studentId
-     * - Inicializa this.grades como un objeto vacío {}
+     * - Inicializa this.gradess como un objeto vacío {}
      */
     constructor(name, studentId) {
-        throw new Error('Student constructor not implemented');
+        if (typeof name !== 'string') throw new Error('Student name is required')
+        const nameFixed = name.trim()
+        if (nameFixed === '') throw new Error('Student name is required')
+
+        if (typeof studentId !== 'string') throw new Error('Student ID is required')
+        const studentIdFixed = studentId.trim()
+        if (studentIdFixed === '') throw new Error('Student ID is required')
+
+        this.name = nameFixed
+        this.studentId = studentIdFixed
+        this.grades = {}
+
     }
 
     /**
@@ -57,12 +68,26 @@ class Student {
      * - Lanza error "Subject name is required" si el subject es inválido
      * - Valida que grade sea un número entre 0 y 100 (inclusive)
      * - Lanza error "Grade must be a number between 0 and 100" si la calificación es inválida
-     * - Si this.grades[subject] no existe, créalo como un array vacío
+     * - Si this.gradess[subject] no existe, créalo como un array vacío
      * - Agrega la calificación al array de esa materia usando push()
      * - Retorna el número total de calificaciones de esa materia (length del array)
      */
     addGrade(subject, grade) {
-        throw new Error('Method addGrade not implemented');
+        if (typeof subject !== 'string') throw new Error('Subject name is required')
+        if (subject.trim() === '') throw Error('Subject name is required')
+        if (!(grade >= 0 && grade <= 100)) throw new Error('Grade must be a number between 0 and 100')
+
+
+
+        if (Object.keys(this.grades).length === 0) {
+            this.grades[subject] = [grade]
+            return this.grades[subject].length
+        }
+        if (Object.keys(this.grades).includes(subject)) return this.grades[subject].push(grade)
+        else this.grades[subject] = [grade]
+
+
+        return this.grades[subject].length
     }
 
     /**
@@ -76,8 +101,8 @@ class Student {
      * @returns {number} El promedio general (0-100) con 2 decimales
      *
      * TODO:
-     * - Si no hay calificaciones (this.grades está vacío o todos los arrays están vacíos), retorna 0
-     * - Obtén todos los arrays de calificaciones usando Object.values(this.grades)
+     * - Si no hay calificaciones (this.gradess está vacío o todos los arrays están vacíos), retorna 0
+     * - Obtén todos los arrays de calificaciones usando Object.values(this.gradess)
      * - Aplana los arrays usando flat() para tener un solo array con todas las calificaciones
      * - Usa reduce() para sumar todas las calificaciones
      * - Calcula el promedio: suma / cantidad de calificaciones
@@ -85,7 +110,11 @@ class Student {
      * - Retorna el promedio calculado
      */
     getAverage() {
-        throw new Error('Method getAverage not implemented');
+        const validationScope = Object.keys(this.grades)
+        if (validationScope.length === 0) return 0
+        const average = parseFloat((Object.values(this.grades).flat().reduce((a, b) => a + b) / Object.values(this.grades).flat().length).toFixed(2))
+
+        return average
     }
 
     /**
@@ -100,7 +129,7 @@ class Student {
      * @returns {number} El promedio de esa materia (0-100) con 2 decimales
      *
      * TODO:
-     * - Verifica si this.grades[subject] existe
+     * - Verifica si this.gradess[subject] existe
      * - Si no existe o el array está vacío, retorna 0
      * - Usa reduce() para sumar todas las calificaciones de esa materia
      * - Calcula el promedio: suma / cantidad de calificaciones
@@ -108,7 +137,17 @@ class Student {
      * - Retorna el promedio calculado
      */
     getAverageBySubject(subject) {
-        throw new Error('Method getAverageBySubject not implemented');
+        const validationArry = Object.keys(this.grades)
+        if (!(validationArry.includes(subject))) return 0
+
+        const lengthArry = this.grades[subject].length
+        if (lengthArry >= 2) {
+            const average = parseFloat((this.grades[subject].reduce((a, b) => a + b) / lengthArry).toFixed(2))
+            return average
+
+        } else if (lengthArry === 1) return this.grades[subject][0]
+        else return 0
+
     }
 
     /**
@@ -122,13 +161,18 @@ class Student {
      * @returns {number[]} Array con las calificaciones de esa materia (nuevo array)
      *
      * TODO:
-     * - Verifica si this.grades[subject] existe
+     * - Verifica si this.gradess[subject] existe
      * - Si no existe, retorna un array vacío []
      * - Si existe, retorna una copia del array usando [...array] o slice()
      * - No debe mutar el array original
      */
     getGradesBySubject(subject) {
-        throw new Error('Method getGradesBySubject not implemented');
+        const subjects = Object.keys(this.grades).includes(subject)
+        if (!subjects) return []
+
+        const copyArry = [...this.grades[subject]]
+
+        return copyArry
     }
 
     /**
@@ -148,7 +192,12 @@ class Student {
      * - Retorna true si promedio >= minGrade, false en caso contrario
      */
     hasPassed(minGrade = 70) {
-        throw new Error('Method hasPassed not implemented');
+        const validationCalifications = Object.keys(this.grades).length
+        if (validationCalifications === 0) return false
+
+        const average = this.getAverage()
+        if (average >= minGrade) return true
+        else return false
     }
 
     /**
@@ -162,7 +211,7 @@ class Student {
      * @returns {string|null} El nombre de la materia con mejor promedio, o null si no hay calificaciones
      *
      * TODO:
-     * - Obtén todas las materias usando Object.keys(this.grades)
+     * - Obtén todas las materias usando Object.keys(this.gradess)
      * - Si no hay materias (array vacío), retorna null
      * - Itera sobre las materias y calcula el promedio de cada una usando getAverageBySubject()
      * - Encuentra la materia con el promedio más alto
@@ -170,7 +219,21 @@ class Student {
      * - Retorna el nombre de la mejor materia
      */
     getBestSubject() {
-        throw new Error('Method getBestSubject not implemented');
+        const subjets = Object.keys(this.grades)
+        if (subjets.length === 0) return null
+
+        let count = 0
+        let bestSubjet = ''
+        for (let nameSubjet of subjets) {
+            let averageSubjet = this.getAverageBySubject(nameSubjet)
+            if (averageSubjet > count) {
+                count = averageSubjet
+                bestSubjet = nameSubjet 
+            }
+        }
+
+        return bestSubjet
+
     }
 
     /**
@@ -183,13 +246,42 @@ class Student {
      * @returns {number} El número de materias distintas
      *
      * TODO:
-     * - Obtén todas las materias usando Object.keys(this.grades)
+     * - Obtén todas las materias usando Object.keys(this.gradess)
      * - Retorna el número de materias (length del array)
      */
     getSubjectCount() {
-        throw new Error('Method getSubjectCount not implemented');
+        const allSubjets = Object.keys(this.grades).length
+        return allSubjets
     }
 }
+
+
+const armando = new Student('Armando Graterol', '12186')
+console.log(armando)
+armando.addGrade('Matematicas', 10)
+// armando.addGrade('Matematicas', 5)
+// armando.addGrade('Matematicas', 12)
+
+armando.addGrade('Poker', 90)
+// armando.addGrade('Poker', 12)
+// armando.addGrade('Poker', 14)
+// armando.addGrade('Poker', 44)
+
+armando.addGrade('Fisica', 40)
+// armando.addGrade('Fisica', 8)
+// armando.addGrade('Fisica', 82)
+
+console.log(armando.getAverage())
+console.log(armando.getAverageBySubject('Fisica'))
+console.log(armando.getGradesBySubject('Fisica'))
+console.log(armando.hasPassed())
+console.log(armando.getBestSubject())
+console.log(armando.getSubjectCount())
+
+
+
+
+
 
 module.exports = {
     Student

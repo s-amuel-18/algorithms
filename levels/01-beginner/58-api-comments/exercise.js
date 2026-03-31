@@ -14,7 +14,10 @@
 async function fetchCommentsByPost(postId) {
   // Tu código aquí
   // 1. Obtener datos de la API usando el parámetro postId
+  const url = await fetch(`https://jsonplaceholder.typicode.com/comments?postId=${postId}`)
+  if (!url.ok) throw new Error(`hubo un problema con la api error ${url.status}`)
   // 2. Retornar el array de comentarios
+  return await url.json()
 }
 
 /**
@@ -26,7 +29,9 @@ async function fetchCommentsByPost(postId) {
 async function getCommentersEmails(postId) {
   // Tu código aquí
   // 1. Llamar a fetchCommentsByPost(postId)
+  const arryPost = await fetchCommentsByPost(postId)
   // 2. Mapear el resultado para obtener solo la propiedad 'email'
+  return arryPost.map(post => post.email)
 }
 
 /**
@@ -39,7 +44,18 @@ async function getCommentersEmails(postId) {
 async function countCommentsByDomain(postId) {
   // Tu código aquí
   // 1. Llamar a getCommentersEmails(postId)
+  const emails = await getCommentersEmails(postId)
+  let estadisticas = {}
+
+  for (email of emails) {
+    const separar = (email.split('@'))[1].split('.')[1]
+
+    if (!estadisticas[separar]) estadisticas[separar] = 1
+    else estadisticas[separar] += 1
+    // console.log(separar)
+  }
   // 2. Extraer el dominio (parte después del último punto) de cada email
+  return estadisticas
   // 3. Contar cuántos hay de cada uno (usando un objeto o reduce)
 }
 
@@ -57,8 +73,23 @@ async function countCommentsByDomain(postId) {
 async function getPostWithComments(postId) {
   // Tu código aquí
   // 1. Obtener el post y los comentarios (pueden ser paralelos)
+  const post = await fetch(`https://jsonplaceholder.typicode.com/posts/${postId}`)
+  if (!post.ok) throw new Error("hubo un error con la peticion " + post.status);
+  const solvePost = await post.json()
+
+  const comentarios = await fetchCommentsByPost(postId)
+
+  console.log(solvePost)
+  console.log(comentarios)
   // 2. Crear el objeto combinado
   // 3. Retornar el resultado
+  return {
+    id: solvePost.id,
+    title: solvePost.title,
+    body: solvePost.body,
+    comments: comentarios,
+    totalComments: comentarios.length
+  }
 }
 
 /**
@@ -71,6 +102,10 @@ async function getPostWithComments(postId) {
  */
 async function searchComments(query) {
   // Tu código aquí
+  const url = await fetch(`https://jsonplaceholder.typicode.com/comments?q=${query}`)
+  if (!url.ok) throw new Error("hubo un error");
+
+  return await url.json()
   // 1. Hacer petición fetch con el parámetro q
   // 2. Retornar los resultados
 }
@@ -82,3 +117,9 @@ module.exports = {
   getPostWithComments,
   searchComments
 };
+
+// fetchCommentsByPost(1).then(c => console.log(c))
+// getCommentersEmails(1).then(c => console.log(c))
+countCommentsByDomain(1).then(c => console.log(c))
+// getPostWithComments(1).then(c => console.log(c))
+// searchComments('nemo suscipit totam vitae').then(c => console.log(c))

@@ -225,6 +225,7 @@ describe('Sistema de Gestión de Suscripciones', () => {
             const service = new SubscriptionService('MyService');
             const subscriber = new Subscriber('S001', 'Juan', 'juan@email.com');
             service.registerSubscriber(subscriber);
+            // service.registerSubscriber(subscriber);
             expect(() => service.registerSubscriber(new Subscriber('S001', 'Pedro', 'pedro@email.com'))).toThrow('Subscriber ID already exists');
         });
     });

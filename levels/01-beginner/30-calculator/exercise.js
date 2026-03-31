@@ -24,14 +24,14 @@ class Calculator {
      * Crea una nueva calculadora con un valor inicial opcional.
      * Si no se proporciona un valor inicial, se usa 0 por defecto.
      *
-     * @param {number} [initialValue=0] - Valor inicial de la calculadora (default: 0)
+     * @param {n¡umber} [initialValue=0] - Valor inicial de la calculadora (default: 0)
      *
      * TODO:
      * - Asigna el parámetro initialValue a this.value
      * - Si no se proporciona initialValue, usa 0 como valor por defecto
      */
     constructor(initialValue = 0) {
-        throw new Error('Calculator constructor not implemented');
+        this.value = initialValue
     }
 
     /**
@@ -49,7 +49,8 @@ class Calculator {
      * - Retorna this (la instancia) para permitir encadenamiento
      */
     add(number) {
-        throw new Error('Method add not implemented');
+        this.value += number
+        return this
     }
 
     /**
@@ -67,7 +68,8 @@ class Calculator {
      * - Retorna this (la instancia) para permitir encadenamiento
      */
     subtract(number) {
-        throw new Error('Method subtract not implemented');
+        this.value -= number
+        return this
     }
 
     /**
@@ -85,7 +87,8 @@ class Calculator {
      * - Retorna this (la instancia) para permitir encadenamiento
      */
     multiply(number) {
-        throw new Error('Method multiply not implemented');
+        this.value *= number
+        return this
     }
 
     /**
@@ -108,7 +111,9 @@ class Calculator {
      * - Retorna this (la instancia) para permitir encadenamiento
      */
     divide(number) {
-        throw new Error('Method divide not implemented');
+        if (number === 0) throw new Error('Division by zero is not allowed')
+        this.value /= number
+        return this
     }
 
     /**
@@ -125,7 +130,8 @@ class Calculator {
      * - Retorna this (la instancia) para permitir encadenamiento
      */
     clear() {
-        throw new Error('Method clear not implemented');
+        this.value = 0
+        return this
     }
 
     /**
@@ -141,9 +147,18 @@ class Calculator {
      * - Retorna el valor de this.value sin modificarlo
      */
     getValue() {
-        throw new Error('Method getValue not implemented');
+        return this.value
     }
 }
+
+const numero = new Calculator(20)
+console.log(numero)
+numero.add(5)
+console.log(numero)
+numero.getValue()
+console.log(numero)
+
+
 
 module.exports = {
     Calculator

@@ -13,6 +13,17 @@
  * - Responsabilidad Única: cada método cumple una sola tarea
  */
 
+function capitalize(text) {
+    const onlyText = text.trim()
+    const firstCaracter = onlyText.charAt(0).toUpperCase()
+    const otherCaracters = onlyText.slice(1)
+    const textFine = firstCaracter + otherCaracters
+
+    return textFine
+}
+
+
+
 class SmartDevice {
     /**
      * @param {string} name - Device name (capitalized)
@@ -25,9 +36,29 @@ class SmartDevice {
      * - Normaliza `name` (capitalizado) y `room` (minúsculas).
      * - Asigna `isOn` con el valor recibido o `false`.
      */
+
+
     constructor(name, room, watts, isOn = false) {
-        throw new Error('SmartDevice constructor not implemented');
+
+
+        if (typeof name === 'object') throw new Error('Device must be an instance of SmartDevice')
+
+        if (name === '' || /^\s+$/g.test(name)) throw new Error('Device name is required')
+        if (room === '' || /^\s+$/g.test(room)) throw new Error('Device room is required')
+        if (watts <= 0 || !Number.isFinite(watts)) throw new Error('Device watts must be a number greater than 0')
+        const textCap = capitalize(name)
+        const roomLower = room.toLowerCase()
+
+
+        this.name = textCap
+        this.room = roomLower
+        this.watts = watts
+        this.isOn = isOn
+
+
     }
+
+
 
     /**
      * Turns the device on.
@@ -37,7 +68,7 @@ class SmartDevice {
      * - Actualiza `this.isOn` y retorna el nuevo estado.
      */
     turnOn() {
-        throw new Error('Method turnOn not implemented');
+        return this.isOn = true
     }
 
     /**
@@ -48,7 +79,7 @@ class SmartDevice {
      * - Actualiza `this.isOn` y retorna el estado.
      */
     turnOff() {
-        throw new Error('Method turnOff not implemented');
+        return this.isOn = false
     }
 
     /**
@@ -62,9 +93,15 @@ class SmartDevice {
      * - En caso contrario, retorna `this.watts * hours`.
      */
     getConsumption(hours) {
-        throw new Error('Method getConsumption not implemented');
+        if (!(hours > 0)) throw new Error('Usage hours must be a positive number')
+        if (this.isOn) return this.watts *= hours
+        return 0
+
     }
 }
+
+
+
 
 class SmartHomeMonitor {
     /**
@@ -73,8 +110,8 @@ class SmartHomeMonitor {
      * TODO:
      * - Inicializa un array interno para almacenar los dispositivos.
      */
+    smartRegistry = []
     constructor() {
-        throw new Error('SmartHomeMonitor constructor not implemented');
     }
 
     /**
@@ -89,8 +126,23 @@ class SmartHomeMonitor {
      * - Agrega el dispositivo y retorna el total.
      */
     addDevice(device) {
-        throw new Error('Method addDevice not implemented');
+        if (!(device instanceof SmartDevice)) throw new Error('Device must be an instance of SmartDevice')
+        if (this.smartRegistry.length === 0) {
+            this.smartRegistry.push(device)
+            return this.smartRegistry.length
+        }
+
+        for (let i = 0; i < this.smartRegistry.length; i++) {
+            const foundDevice = this.smartRegistry[i]
+            if (foundDevice.name === device.name) throw new Error('Device name already registered')
+
+        }
+        this.smartRegistry.push(device)
+        return this.smartRegistry.length
     }
+
+
+
 
     /**
      * Finds a device by name (case-insensitive).
@@ -102,7 +154,10 @@ class SmartHomeMonitor {
      * - Retorna el dispositivo o `null`.
      */
     findByName(name) {
-        throw new Error('Method findByName not implemented');
+        if (this.smartRegistry.length === 0 || name === 'Unknown') return null
+        const nameCap = capitalize(name)
+        const registry = this.smartRegistry
+        return registry.find(device => device.name === nameCap)
     }
 
     /**
@@ -116,7 +171,25 @@ class SmartHomeMonitor {
      * - Retorna un objeto nuevo con las claves solicitadas.
      */
     getRoomReport(room) {
-        throw new Error('Method getRoomReport not implemented');
+        const roomFixed = room.toLowerCase()
+        if (this.smartRegistry.length === 0) throw new Error('Room name is required')
+
+
+        if (roomFixed === '') throw new Error('Room name is required')
+        const deviceFilter = this.smartRegistry.filter(deviceFound => deviceFound.room === roomFixed).map(deviceFound => deviceFound.name)
+
+        const activeDevice = this.smartRegistry.filter(activedevi => activedevi.room === roomFixed).filter(e => e.isOn === true).length
+
+        const totalWatts = this.smartRegistry.filter(wattsFind => wattsFind.room === roomFixed).map(wattsFind => wattsFind.watts).reduce((a, b) => a + b, 0)
+
+
+
+        return {
+            room: roomFixed,
+            devices: deviceFilter,
+            activeDevices: activeDevice,
+            totalWatts: totalWatts
+        }
     }
 
     /**
@@ -129,10 +202,28 @@ class SmartHomeMonitor {
      * - Suma `device.getConsumption(hours)` para cada dispositivo y retorna el total.
      */
     getActiveConsumption(hours) {
-        throw new Error('Method getActiveConsumption not implemented');
+        if (hours <= 0) throw new Error('Usage hours must be a positive number')
+
+        const consumeAll = this.smartRegistry.map(consumewatts => consumewatts.getConsumption(hours)).reduce((a, b) => a + b)
+
+        return consumeAll
     }
 }
 
+
+
+const monitor = new SmartHomeMonitor();
+const names = Array.from({ length: 20 }, (_, index) => `Device-${index}`);
+names.forEach((name, index) => {
+    const device = new SmartDevice(name, index % 2 === 0 ? 'lab' : 'garage', 50 + index);
+    if (index % 3 === 0) {
+        device.turnOn();
+    }
+    monitor.addDevice(device);
+});
+
+console.log(monitor.findByName('   Device-1   '))
+monitor.getRoomReport('lab')
 module.exports = {
     SmartDevice,
     SmartHomeMonitor

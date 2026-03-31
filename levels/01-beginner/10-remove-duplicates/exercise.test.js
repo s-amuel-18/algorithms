@@ -56,7 +56,7 @@ describe('Remove Duplicates', () => {
 
     test('debe manejar arrays mixtos (enteros y decimales)', () => {
         expect(removeDuplicates([1, 1.5, 2, 1.5, 3])).toEqual([1, 1.5, 2, 3]);
-        expect(removeDuplicates([5, 5.0, 5.5, 5, 6])).toEqual([5, 5.0, 5.5, 6]);
+        expect(removeDuplicates([5, 5.0, 5.5, 5, 6])).toEqual([5, 5.5, 6]);
     });
 
     test('debe mantener el orden de aparición', () => {

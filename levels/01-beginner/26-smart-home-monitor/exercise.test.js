@@ -157,6 +157,7 @@ describe('Smart Home Monitor', () => {
             });
 
             const report = monitor.getRoomReport('lab');
+            console.log("TEST", monitor.smartRegistry.le)
             expect(report.devices).toEqual(names.filter((_, idx) => idx % 2 === 0));
             expect(report.activeDevices).toBe(4); // indexes 0,6,12,18
         });

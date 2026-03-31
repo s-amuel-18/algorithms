@@ -11,7 +11,26 @@
  * calculateAgeInDays(1990) // Aproximadamente 12410 días (depende del año actual)
  */
 
+let date = 2000
+
 function calculateAgeInDays(birthYear) {
+    let thisYear = new Date().getFullYear()
+    let years = thisYear -  birthYear
+    let daysWOvi = years * 365
+    let count = 0
+    for(let i = birthYear; i < thisYear; i++){
+        if(i % 4 === 0 && i % 100 !== 0 || i % 400 === 0){
+            count ++
+        }
+    }
+
+    let daysComplete = daysWOvi + count
+
+    console.log(daysComplete, count, daysWOvi)
+    
+
+       return daysComplete
+    
     // TODO: Implementar la solución aquí
     
     // Pista 1: Obtén el año actual usando new Date().getFullYear()
@@ -22,7 +41,10 @@ function calculateAgeInDays(birthYear) {
     
     // Pista 4: Un año es bisiesto si es divisible por 4, excepto si es divisible por 100 pero no por 400
     
-    throw new Error('Función no implementada');
+    // throw new Error('Función no implementada');
 }
+
+calculateAgeInDays(date)
+
 
 module.exports = calculateAgeInDays;

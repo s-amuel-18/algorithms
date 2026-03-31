@@ -1,5 +1,4 @@
-const {
-  calculateFactorial,
+const { calculateFactorial,
   isFactorialOf,
   findFactorialDigits,
   factorialRange,

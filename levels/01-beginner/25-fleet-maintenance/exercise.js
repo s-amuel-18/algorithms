@@ -25,7 +25,24 @@ class Vehicle {
      * - Asigna las propiedades a `this`.
      */
     constructor(plate, type, mileage) {
-        throw new Error('Vehicle constructor not implemented');
+
+
+        type = type.trim()
+        plate = plate.trim()
+        if (plate === '') throw new Error('Vehicle plate is required')
+        if (type === '') throw new Error('Vehicle type is required')
+        if (mileage < 0) throw new Error('Vehicle mileage must be a number greater than or equal to 0')
+
+        plate = plate.toUpperCase()
+
+
+        this.plate = plate
+        this.type = type
+        this.mileage = mileage
+
+
+
+        // throw new Error('Vehicle constructor not implemented');
     }
 
     /**
@@ -36,7 +53,9 @@ class Vehicle {
      * - Usa template literals y respeta el formato solicitado.
      */
     getSummary() {
-        throw new Error('Method getSummary not implemented');
+        console.log(`${this.plate} (${this.type}) has ${this.mileage} km`)
+        return `${this.plate} (${this.type}) has ${this.mileage} km`
+        // throw new Error('Method getSummary not implemented');
     }
 
     /**
@@ -50,19 +69,43 @@ class Vehicle {
      * - Suma al kilometraje y retorna el nuevo valor.
      */
     addTrip(kilometers) {
-        throw new Error('Method addTrip not implemented');
+        if (Number.isFinite(kilometers) && kilometers > 0) {
+            this.mileage = this.mileage + kilometers
+            console.log(this.mileage)
+            return this.mileage
+        } else if (kilometers <= 0) {
+            throw new Error('Trip distance must be a positive number')
+        }
+        // throw new Error('Method addTrip not implemented');
     }
 }
+
+
+
+
+
+
+
+// const renoult1 = new Vehicle('   ', 'van', 8500)
+const renoult3 = new Vehicle('ASsd12', 'van', 4)
+const renoult22 = new Vehicle('ASE412', 'van', 421321)
+
+// renoult22.addTrip(0)
+
+// renoult1.addTrip(33)
 
 class FleetManager {
     /**
      * Creates an empty fleet registry.
      *
      * TODO:
-     * - Inicializa `this.vehicles` como array vacío.
+     * - Inicializa `this.#vehicles` como array vacío.
      */
+    #vehicles = []
     constructor() {
-        throw new Error('FleetManager constructor not implemented');
+
+
+        // throw new Error('FleetManager constructor not implemented');
     }
 
     /**
@@ -77,8 +120,17 @@ class FleetManager {
      *   lanza "Vehicle plate already registered".
      * - Agrega al array y retorna `length`.
      */
+
     addVehicle(vehicle) {
-        throw new Error('Method addVehicle not implemented');
+        if (!(vehicle instanceof Vehicle)) throw new Error('Vehicle must be an instance of Vehicle')
+        if (this.existsPlate(vehicle.plate)) throw new Error('Vehicle plate already registered')
+
+        this.#vehicles.push(vehicle)
+
+        return this.#vehicles.length
+
+
+        // throw new Error('Method addVehicle not implemented');
     }
 
     /**
@@ -90,8 +142,20 @@ class FleetManager {
      * - Normaliza la entrada (trim + uppercase) y busca en el array.
      * - Retorna la coincidencia o `null` si no existe.
      */
-    findByPlate(plate) {
-        throw new Error('Method findByPlate not implemented');
+    findByPlate(inputPlate) {
+        const plate = inputPlate.trim()
+        const vehiculeFound = this.#vehicles.find(plateVehiculo => {
+            plateVehiculo.plate === plate
+            return plateVehiculo.type
+        })
+        if (vehiculeFound === undefined) {
+            return null
+        }
+
+        return vehiculeFound
+
+        // if(!(plate === plateFound)) return console.log(plateFound)
+        // throw new Error('Method findByPlate not implemented');
     }
 
     /**
@@ -106,9 +170,54 @@ class FleetManager {
      * - Retorna un nuevo array (no expongas el original).
      */
     getMaintenanceList(threshold) {
-        throw new Error('Method getMaintenanceList not implemented');
+        if (threshold < 0) throw ('Maintenance threshold must be a number greater than or equal to 0')
+
+        const vehivlesArry = this.#vehicles.filter(vehicle => vehicle.mileage >= threshold)
+        const arryDescription = vehivlesArry.map(description => description.getSummary())
+        return arryDescription
+        // throw new Error('Method getMaintenanceList not implemented');
+    }
+
+
+
+    existsPlate(plate) {
+        for (let i = 0; i < this.#vehicles.length; i++) {
+            const actualVehicle = this.#vehicles[i]
+            if (plate === actualVehicle.plate) {
+                return true
+            }
+        }
+        return false
     }
 }
+
+
+const registreVehicles = new FleetManager()
+
+// registreVehicles.addVehicle(renoult1)
+registreVehicles.addVehicle(renoult22)
+registreVehicles.addVehicle(renoult3)
+// console.log('consulta ',registreVehicles)
+console.log('aqui', registreVehicles)
+
+let a = '  '
+console.log(a)
+console.log(a.trim())
+
+// let a = [1,2,3]
+
+// console.log(a.find(as => as === 1 ))
+
+const buildVehicle = (plate = 'ABC123', type = 'truck', mileage = 10000) =>
+    new Vehicle(plate, type, mileage);
+
+const fleet = new FleetManager();
+for (let i = 0; i < 30; i ++) {
+    fleet.addVehicle(buildVehicle(`CAR${i}`, 'car', i * 1000));
+}
+const list = fleet.getMaintenanceList(20000);
+console.log(list, 'es aqui?')
+
 
 module.exports = {
     Vehicle,

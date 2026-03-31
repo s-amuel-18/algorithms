@@ -40,7 +40,16 @@ class Bus {
      * - Asigna los valores validados a this.busNumber y this.capacity
      */
     constructor(busNumber, capacity) {
-        throw new Error('Bus constructor not implemented');
+        if (busNumber.trim() === '' || typeof busNumber !== 'string') throw new Error("Bus number is required");
+        if (capacity <= 0) throw new Error("Bus capacity must be greater than 0");
+
+        this.currentPassengers = 0
+        this.currentRoute = null
+        this.isInService = true
+        this.busNumber = busNumber
+        this.capacity = capacity
+
+
     }
 
     /**
@@ -61,7 +70,11 @@ class Bus {
      * - Retorna el nuevo total de pasajeros
      */
     boardPassengers(count) {
-        throw new Error('Method boardPassengers not implemented');
+        if (count <= 0) throw new Error("Passenger count must be greater than 0");
+        if (!((this.currentPassengers + count) <= this.capacity)) throw new Error("Not enough capacity");
+        else return this.currentPassengers += count
+
+
     }
 
     /**
@@ -82,7 +95,11 @@ class Bus {
      * - Retorna el nuevo total de pasajeros
      */
     alightPassengers(count) {
-        throw new Error('Method alightPassengers not implemented');
+        if (count <= 0) throw new Error("Passenger count must be greater than 0");
+        if (this.currentPassengers <= count) throw new Error("Not enough passengers on board");
+
+        return this.currentPassengers -= count
+
     }
 
     /**
@@ -98,7 +115,7 @@ class Bus {
      * - Retorna el número de asientos disponibles (no puede ser negativo, retorna 0 si es negativo)
      */
     getAvailableSeats() {
-        throw new Error('Method getAvailableSeats not implemented');
+        return this.capacity - this.currentPassengers
     }
 
     /**
@@ -117,7 +134,10 @@ class Bus {
      * - Retorna true
      */
     setRoute(route) {
-        throw new Error('Method setRoute not implemented');
+        if (!(route instanceof Route)) throw new Error("Route must be an instance of Route");
+        this.currentRoute = route
+        return true
+
     }
 
     /**
@@ -134,7 +154,7 @@ class Bus {
      * - Retorna el porcentaje calculado
      */
     getOccupancyRate() {
-        throw new Error('Method getOccupancyRate not implemented');
+        return parseFloat(((this.currentPassengers / this.capacity) * 100).toFixed(2))
     }
 }
 
@@ -166,7 +186,15 @@ class Route {
      * - Asigna los valores validados a las propiedades correspondientes
      */
     constructor(routeNumber, distance, fare) {
-        throw new Error('Route constructor not implemented');
+        if (routeNumber.trim() === '' || typeof routeNumber !== 'string') throw new Error("Route number is required");
+        if (distance <= 0) throw new Error("Route distance must be greater than 0");
+        if (fare <= 0) throw new Error("Route fare must be greater than 0");
+
+        this.stops = []
+        this.routeNumber = routeNumber
+        this.distance = distance
+        this.fare = fare
+
     }
 
     /**
@@ -187,7 +215,14 @@ class Route {
      * - Retorna el número total de paradas (this.stops.length)
      */
     addStop(stopName) {
-        throw new Error('Method addStop not implemented');
+        if (stopName.trim() === 0 || typeof stopName !== 'string') throw new Error("Stop name is required");
+        const exist = this.stops.find(stop => stop === stopName)
+        if (exist !== undefined) throw new Error("Stop already exists");
+        else this.stops.push(stopName)
+
+        return this.stops.length
+
+
     }
 
     /**
@@ -202,7 +237,7 @@ class Route {
      * - Retorna this.stops.length
      */
     getTotalStops() {
-        throw new Error('Method getTotalStops not implemented');
+        return this.stops.length
     }
 
     /**
@@ -217,7 +252,7 @@ class Route {
      * - Retorna this.distance
      */
     getDistance() {
-        throw new Error('Method getDistance not implemented');
+        return this.distance
     }
 
     /**
@@ -237,7 +272,9 @@ class Route {
      * - Retorna el tiempo calculado
      */
     calculateTravelTime(averageSpeed) {
-        throw new Error('Method calculateTravelTime not implemented');
+        if (averageSpeed <= 0) throw new Error("Average speed must be greater than 0");
+        return parseFloat((this.distance / averageSpeed).toFixed(2))
+
     }
 }
 
@@ -263,7 +300,12 @@ class TransitSystem {
      * - Asigna el nombre validado a this.name
      */
     constructor(name) {
-        throw new Error('TransitSystem constructor not implemented');
+        if (name.trim() === '' || typeof name !== 'string') throw new Error("Transit system name is required");
+
+        this.buses = []
+        this.routes = []
+        this.name = name.trim()
+
     }
 
     /**
@@ -284,7 +326,14 @@ class TransitSystem {
      * - Retorna el número total de buses (this.buses.length)
      */
     addBus(bus) {
-        throw new Error('Method addBus not implemented');
+        if (!(bus instanceof Bus)) throw new Error("Bus must be an instance of Bus");
+        if (this.buses.length === 0 || !(this.buses.find(inBus => inBus.busNumber === bus.busNumber))) this.buses.push(bus)
+        else throw new Error("Bus number already exists");
+
+        return this.buses.length
+
+
+
     }
 
     /**
@@ -305,7 +354,13 @@ class TransitSystem {
      * - Retorna el número total de rutas (this.routes.length)
      */
     addRoute(route) {
-        throw new Error('Method addRoute not implemented');
+        if (!(route instanceof Route)) throw new Error("Route must be an instance of Route");
+        if (this.routes.length === 0 || !(this.routes.find(inRoutes => inRoutes.routeNumber === route.routeNumber))) this.routes.push(route)
+        else throw new Error("Route number already exists");
+
+        return this.routes.length
+
+
     }
 
     /**
@@ -331,7 +386,21 @@ class TransitSystem {
      * - Retorna true
      */
     assignBusToRoute(busNumber, routeNumber) {
-        throw new Error('Method assignBusToRoute not implemented');
+        if (typeof busNumber !== 'string') throw new Error("Bus number must be a string");
+        if (typeof routeNumber !== 'string') throw new Error("routeNumber number must be a string");
+
+        const findBus = this.buses.find(inbus => inbus.busNumber === busNumber)
+        if (findBus === undefined) throw new Error("Bus not found");
+
+        const findRoute = this.routes.find(rute => rute.routeNumber === routeNumber)
+        if (findRoute === undefined) throw new Error("Route not found");
+
+        findBus.setRoute(findRoute)
+        return true
+
+
+
+
     }
 
     /**
@@ -352,7 +421,14 @@ class TransitSystem {
      * - Retorna el nuevo array filtrado
      */
     getBusesByRoute(routeNumber) {
-        throw new Error('Method getBusesByRoute not implemented');
+        if (typeof routeNumber !== 'string') throw new Error("Route number must be a string");
+
+        const busesByRoute = this.buses.find(bus => bus.currentRoute.routeNumber === routeNumber)
+        if (busesByRoute === undefined) return []
+
+
+        return this.buses.filter(bus => bus.currentRoute.routeNumber === routeNumber)
+
     }
 
     /**
@@ -370,7 +446,9 @@ class TransitSystem {
      * - Si no hay buses, retorna 0
      */
     getTotalPassengers() {
-        throw new Error('Method getTotalPassengers not implemented');
+        return this.buses.reduce((acumulador, passenger) => {
+            return acumulador + (passenger.currentPassengers)
+        }, 0)
     }
 
     /**
@@ -390,7 +468,9 @@ class TransitSystem {
      * - Retorna el total de ingresos
      */
     getRevenue() {
-        throw new Error('Method getRevenue not implemented');
+        return this.buses.reduce((acumulador, bus) => {
+            return acumulador + parseFloat((bus.currentPassengers * bus.currentRoute.fare).toFixed(2))
+        }, 0)
     }
 
     /**
@@ -410,9 +490,84 @@ class TransitSystem {
      * - Si ninguna ruta tiene buses asignados, retorna null
      */
     getMostPopularRoute() {
-        throw new Error('Method getMostPopularRoute not implemented');
+        if (this.buses.length === 0) return null
+        const volumenRout = {}
+        const busesByRoute = this.routes.filter(rute => {
+            const arrybuses = this.getBusesByRoute(rute.routeNumber)
+
+            const personas = arrybuses.reduce((contador, passenger) => {
+                return contador + (passenger.currentPassengers)
+            }, 0)
+
+            volumenRout[rute.routeNumber] = personas
+
+        })
+        let max = 0
+        for (const rute in volumenRout) {
+            if (max < volumenRout[rute]) max = rute
+
+
+        }
+        return this.routes.find(route => route.routeNumber === max)
+
     }
 }
+
+// const bus1 = new Bus('22', 75)
+// const bus2 = new Bus('23', 25)
+// const bus3 = new Bus('24', 12)
+// console.log(bus1.boardPassengers(75))
+// console.log(bus2.boardPassengers(25))
+// // console.log(bus1.alightPassengers(25))
+// // console.log(bus1.getAvailableSeats())
+// // console.log(bus1.getOccupancyRate())
+
+// const eneroDe23 = new Route('12', 250, 60)
+// const chacao = new Route('24', 250, 60)
+
+// // console.log(bus1.setRoute(eneroDe23))
+// // console.log(eneroDe23.addStop('Agua Salud'))
+// // console.log(eneroDe23.addStop('La Canada'))
+// // console.log(eneroDe23.addStop('Centro'))
+// // console.log(eneroDe23.getTotalStops())
+// // console.log(eneroDe23.getDistance())
+// // console.log(eneroDe23.calculateTravelTime(20))
+// // console.log(bus1)
+
+// const sistema = new TransitSystem('Transito Caracas')
+// console.log(sistema.addBus(bus1))
+// console.log(sistema.addBus(bus2))
+// console.log(sistema.addBus(bus3))
+// console.log(sistema.addRoute(eneroDe23))
+// console.log(sistema.addRoute(chacao))
+// console.log(sistema.assignBusToRoute('22', '12'))
+// console.log(sistema.assignBusToRoute('23', '12'))
+// console.log(sistema.assignBusToRoute('24', '24'))
+// console.log(sistema.getBusesByRoute('24'))
+// console.log(sistema.getTotalPassengers())
+// console.log(sistema.getRevenue())
+// console.log('////////////////////')
+// console.log(sistema.getMostPopularRoute())
+// console.log('////////////////////')
+// // console.log(JSON.stringify(sistema, null, 2))
+
+const system = new TransitSystem('City Transit');
+const route1 = new Route('R1', 10, 2.50);
+const route2 = new Route('R2', 15, 3.00);
+const bus1 = new Bus('B101', 50);
+const bus2 = new Bus('B102', 50);
+bus1.boardPassengers(50);
+bus2.boardPassengers(30);
+
+system.addRoute(route1);
+system.addRoute(route2);
+system.addBus(bus1);
+system.addBus(bus2);
+system.assignBusToRoute('B101', 'R1');
+system.assignBusToRoute('B102', 'R2');
+
+console.log(JSON.stringify(system, null, 2))
+console.log(system.getMostPopularRoute())
 
 module.exports = {
     Bus,

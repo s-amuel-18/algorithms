@@ -13,11 +13,35 @@
  */
 
 function twoSum(nums, target) {
-    // TODO: Implementar la solución aquí
-    
-    // Pista: Puedes usar un hash map para almacenar los números vistos junto con sus índices
-    
-    throw new Error('Función no implementada');
+   for (let i = 0; i<nums.length; i++){
+        let principal = nums[i]
+        
+        for (let J = 0; J < nums.length; J++) {
+            let element = nums[J]
+
+                if(i != J){
+
+                let suma = (principal) + (element)
+                if(suma === target){
+                    let resultado = [i, J]
+                    console.log(resultado)
+                    return resultado
+                    
+                }
+                }
+            
+        }
+
+   }
+
+
+    // throw new Error('Función no implementada');
 }
+let numeros = [3, 2, 4]
+let resultado = 6
+const result = twoSum(numeros, resultado)
+console.log (result)
+
 
 module.exports = twoSum;
+

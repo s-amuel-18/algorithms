@@ -85,7 +85,9 @@ describe('Sistema de Gestión de Hotel', () => {
                 // Propósito: Verificar que getGuestName retorna el nombre
                 // Entrada: guestName='María García'
                 // Esperado: Retorna 'María García'
-                const reservation = new Reservation(101, 'María García', new Date(), new Date());
+                 const checkIn = new Date('2024-12-20');
+                const checkOut = new Date('2024-12-23');
+                const reservation = new Reservation(101, 'María García', checkIn, checkOut);
                 expect(reservation.getGuestName()).toBe('María García');
             });
 

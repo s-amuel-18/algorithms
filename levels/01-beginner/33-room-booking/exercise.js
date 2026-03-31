@@ -39,7 +39,19 @@ class Room {
      * - Asigna los valores validados a this.name, this.capacity, this.pricePerHour
      */
     constructor(name, capacity, pricePerHour) {
-        throw new Error('Room constructor not implemented');
+        if (!(typeof name === 'string')) throw new Error('Room name is required')
+        if (name.trim() === '') throw new Error('Room name is required')
+
+        if (!(capacity > 0)) throw new Error('Room capacity must be greater than 0')
+
+        if (!(pricePerHour > 0)) throw new Error('RRoom price per hour must be greater than 0 ')
+
+
+
+
+        this.name = name
+        this.capacity = capacity
+        this.pricePerHour = pricePerHour
     }
 }
 
@@ -59,8 +71,10 @@ class BookingSystem {
      * - Inicializa this.rooms como un array vacío []
      * - Inicializa this.bookings como un array vacío []
      */
+    rooms = []
+    bookings = []
     constructor() {
-        throw new Error('BookingSystem constructor not implemented');
+
     }
 
     /**
@@ -83,7 +97,13 @@ class BookingSystem {
      * - Retorna la sala creada
      */
     addRoom(name, capacity, pricePerHour) {
-        throw new Error('Method addRoom not implemented');
+        const validationName = this.findRoom(name)
+        if (validationName instanceof Object) throw new Error('Room already exists')
+
+        const createRoom = new Room(name, capacity, pricePerHour)
+        this.rooms.push(createRoom)
+
+        return createRoom
     }
 
     /**
@@ -101,7 +121,10 @@ class BookingSystem {
      * - Retorna la sala encontrada o null si no se encuentra
      */
     findRoom(name) {
-        throw new Error('Method findRoom not implemented');
+        const validationName = this.rooms.find(element => element.name == name)
+
+        if (validationName === undefined) return null
+        else return validationName
     }
 
     /**
@@ -135,7 +158,31 @@ class BookingSystem {
      * - Retorna el objeto de reserva creado
      */
     bookRoom(roomName, startTime, duration) {
-        throw new Error('Method bookRoom not implemented');
+        const validationRoom = this.findRoom(roomName)
+        if (validationRoom === null) throw new Error('Room not found')
+
+        if (!(startTime >= 0 && startTime <= 23)) throw new Error('Start time must be between 0 and 23')
+
+        if (!(duration > 0)) throw new Error('Duration must be greater than 0')
+
+
+        const endTime = startTime + duration
+        if (endTime > 24) throw new Error('Booking extends beyond 24 hours')
+
+        const existingRoom = this.bookings.find(objet => objet.roomName == roomName)
+        if (existingRoom) {
+            const existingStartTime = existingRoom.startTime
+            const exexistingEndTime = existingRoom.endTime
+
+            if (exexistingEndTime > startTime && existingStartTime < endTime) throw new Error('Room is already booked at this time')
+
+        }
+
+        const reserva = { roomName, startTime, duration, endTime }
+        this.bookings.push(reserva)
+        return reserva
+
+
     }
 
     /**
@@ -158,7 +205,30 @@ class BookingSystem {
      * - Retorna el nuevo array filtrado
      */
     getAvailableRooms(startTime, duration) {
-        throw new Error('Method getAvailableRooms not implemented');
+        const endTime = startTime + duration
+        const filterRooms = this.rooms.filter(salas => salas.name)
+        const reservas = []
+
+        for (let validationroom of filterRooms) {
+            let name = validationroom.name
+            let countSolapa = 0
+
+
+            for (let check of this.bookings) {
+                const nameRoom = check.roomName
+                const objetBooking = check
+                if (name === nameRoom) {
+                    const existingEndTime = objetBooking.endTime
+                    const existingStartTime = objetBooking.startTime
+                    if (startTime < existingEndTime && endTime > existingStartTime) countSolapa++
+                }
+                console.log(countSolapa, 'chequeo tiempo')
+            }
+            if (countSolapa === 0) reservas.push(validationroom)
+        }
+
+        return reservas
+
     }
 
     /**
@@ -179,7 +249,12 @@ class BookingSystem {
      * - Retorna true si se canceló correctamente
      */
     cancelBooking(roomName, startTime) {
-        throw new Error('Method cancelBooking not implemented');
+        const findBooking = this.bookings.find((name) => name.roomName === roomName && name.startTime === startTime)
+        if (findBooking === undefined) throw new Error('Booking not found')
+
+        const arryFixed = this.bookings.findIndex(name => name.roomName === roomName && name.startTime === startTime)
+        this.bookings.splice(arryFixed, 1)
+        return true
     }
 
     /**
@@ -201,7 +276,14 @@ class BookingSystem {
      * - Retorna el total de ingresos
      */
     getRoomRevenue(roomName) {
-        throw new Error('Method getRoomRevenue not implemented');
+        const findRoom = this.findRoom(roomName)
+        if (findRoom === null) throw new Error('Room not found')
+
+        const filterReservas = this.bookings.filter(reservas => reservas.roomName === roomName)
+        const totalHours = filterReservas.reduce((b, a) => b += (a.duration), 0)
+        const totalPay = findRoom.pricePerHour * totalHours
+
+        return totalPay
     }
 
     /**
@@ -218,10 +300,31 @@ class BookingSystem {
      * - Para cada reserva, busca la sala usando findRoom(booking.roomName)
      * - Suma (room.pricePerHour * booking.duration) al acumulador
      * - Retorna el total de ingresos
-     * - Si no hay reservas, retorna 0
+     * - Si no hay reservas, ret oale
+     * orna 0
      */
     getTotalRevenue() {
-        throw new Error('Method getTotalRevenue not implemented');
+        // if (this.bookings.length === 0) return 0
+
+        // const allPay = this.bookings.reduce((a, b) => {
+        //     const room = this.findRoom(b.roomName)
+        //     console.log(room)
+        //     console.log(a, room.pricePerHour, b.duration, 'complejo')
+        //     a + (room.pricePerHour * b.duration)
+        //     console.log(a, room.pricePerHour, b.duration, 'complejo')
+        // }, 0)
+
+        // return allPay
+
+        return this.bookings.reduce((total, booking) => {
+            // Busca la sala para obtener su precio por hora
+            const room = this.findRoom(booking.roomName);
+
+            // Suma (precio por hora × duración) al total
+            return total + (room.pricePerHour * booking.duration);
+        }, 0);
+
+
     }
 
     /**
@@ -240,9 +343,29 @@ class BookingSystem {
      * - Retorna el nuevo array filtrado
      */
     getBookingsByRoom(roomName) {
-        throw new Error('Method getBookingsByRoom not implemented');
+        const allRoomByName = this.bookings.filter(reservas => reservas.roomName === roomName)
+        return allRoomByName
     }
 }
+
+const viaje1 = new BookingSystem()
+viaje1.addRoom('cocina', 5, 22)
+viaje1.addRoom('terraza', 5, 22)
+
+viaje1.bookRoom('terraza', 20, 2)
+viaje1.bookRoom('cocina', 1, 1)
+viaje1.bookRoom('cocina', 4, 1)
+viaje1.bookRoom('cocina', 7, 1)
+viaje1.bookRoom('cocina', 12, 1)
+
+console.log(viaje1, ' viaje 1')
+console.log(viaje1.getTotalRevenue(), 'chequeo')
+console.log(viaje1.getBookingsByRoom('cocina'))
+
+
+
+
+
 
 module.exports = {
     Room,

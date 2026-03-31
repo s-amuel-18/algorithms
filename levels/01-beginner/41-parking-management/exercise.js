@@ -40,7 +40,16 @@ class ParkingSpot {
      * - Asigna los valores validados a this.spotNumber y this.type
      */
     constructor(spotNumber, type) {
-        throw new Error('ParkingSpot constructor not implemented');
+        if (spotNumber.trim() === '' || typeof spotNumber !== 'string') throw new Error("Spot number is required");
+        if (!(['compact', 'standard', 'large'].includes(type))) throw new Error(`Spot type must be 'compact', 'standard', or 'large'`);
+
+        this.isOccupied = false,
+            this.vehiclePlate = null,
+            this.entryTime = null,
+            this.spotNumber = spotNumber,
+            this.type = type
+
+
     }
 
     /**
@@ -67,7 +76,18 @@ class ParkingSpot {
      * - Retorna true
      */
     parkVehicle(plate, entryTime) {
-        throw new Error('Method parkVehicle not implemented');
+        if (plate.trim() === '' || typeof plate !== 'string') throw new Error("Vehicle plate is required");
+        if (!(entryTime instanceof Date)) throw new Error("Entry time must be a Date object");
+        if (this.isOccupied === true) throw new Error("Spot is already occupied");
+
+        this.vehiclePlate = plate
+        this.entryTime = entryTime
+        this.isOccupied = true
+
+        return true
+
+
+
     }
 
     /**
@@ -85,17 +105,34 @@ class ParkingSpot {
      * - Lanza error "Exit time must be a Date object" si la fecha es inválida
      * - Valida que ratePerHour sea un número mayor que 0
      * - Lanza error "Rate per hour must be greater than 0" si la tarifa es inválida
+     * 
      * - Valida que el espacio esté ocupado (this.isOccupied === true)
      * - Lanza error "Spot is not occupied" si no está ocupado
+     * 
      * - Valida que exitTime sea posterior a this.entryTime
      * - Lanza error "Exit time must be after entry time" si la fecha es inválida
+     * 
      * - Calcula duración usando getParkingDuration(exitTime)
      * - Calcula tarifa usando calculateFee(exitTime, ratePerHour)
      * - Libera el espacio: this.isOccupied = false, this.vehiclePlate = null, this.entryTime = null
      * - Retorna objeto { duration, fee }
      */
     exitVehicle(exitTime, ratePerHour) {
-        throw new Error('Method exitVehicle not implemented');
+        if (!(exitTime instanceof Date)) throw new Error("Exit time must be a Date object");
+        if (ratePerHour <= 0) throw new Error("Rate per hour must be greater than 0");
+        if (this.isOccupied === false) throw new Error("Spot is not occupied");
+        if (exitTime.getTime() < this.entryTime.getTime()) throw new Error("Exit time must be after entry time");
+
+        const duration = this.getParkingDuration(exitTime)
+        const fee = this.calculateFee(exitTime, ratePerHour)
+
+        this.isOccupied = false
+        this.vehiclePlate = null
+        this.entryTime = null
+
+        return { duration, fee }
+
+
     }
 
     /**
@@ -118,7 +155,13 @@ class ParkingSpot {
      * - Retorna la duración calculada
      */
     getParkingDuration(exitTime) {
-        throw new Error('Method getParkingDuration not implemented');
+        if (!(exitTime instanceof Date)) throw new Error("Exit time must be a Date object");
+        if (this.isOccupied === false) throw new Error("Spot is not occupied");
+        const time = exitTime.getTime() - this.entryTime.getTime()
+        const HoursTime = parseFloat((time / (1000 * 60 * 60)).toFixed(2))
+
+        return HoursTime
+
     }
 
     /**
@@ -144,7 +187,14 @@ class ParkingSpot {
      * - Retorna la tarifa calculada
      */
     calculateFee(exitTime, ratePerHour) {
-        throw new Error('Method calculateFee not implemented');
+        if (!(exitTime instanceof Date)) throw new Error("Exit time must be a Date object");
+        if (ratePerHour <= 0) throw new Error("Rate per hour must be greater than 0");
+        if (this.isOccupied === false) throw new Error("Spot is not occupied");
+
+        const time = this.getParkingDuration(exitTime)
+        const fee = parseFloat((time * ratePerHour).toFixed(2))
+
+        return fee
     }
 
     /**
@@ -165,7 +215,23 @@ class ParkingSpot {
      * - Retorna true si es compatible, false en caso contrario
      */
     isCompatible(vehicleType) {
-        throw new Error('Method isCompatible not implemented');
+        if (typeof vehicleType !== 'string') throw new Error("Vehicle type must be a string");
+
+
+        if (this.type === 'compact') {
+            if (['compact'].includes(vehicleType)) return true
+            else return false
+
+        } else if (this.type === 'standard') {
+            if (['compact', 'standard'].includes(vehicleType)) return true
+            else return false
+
+        } else if (this.type === 'large') {
+            if (['compact', 'standard', 'large'].includes(vehicleType)) return true
+            else return false
+
+        }
+
     }
 }
 
@@ -192,7 +258,13 @@ class ParkingLot {
      * - Asigna el nombre validado a this.name
      */
     constructor(name) {
-        throw new Error('ParkingLot constructor not implemented');
+        if (name.trim() === '' || typeof name !== 'string') throw new Error("Parking lot name is required");
+
+        this.spots = []
+        this.hourlyRates = { compact: 2, standard: 3, large: 5 }
+        this.revenue = { compact: 0, standard: 0, large: 0 }
+        this.name = name
+
     }
 
     /**
@@ -217,7 +289,15 @@ class ParkingLot {
      * - Retorna el espacio creado
      */
     addSpot(spotNumber, type) {
-        throw new Error('Method addSpot not implemented');
+        if (spotNumber.trim() === '' || typeof spotNumber !== 'string') throw new Error("Spot number is required");
+        if (!(['compact', 'standard', 'large'].includes(type))) throw new Error(`Spot type must be 'compact', 'standard', or 'large'`);
+        if (this.spots.find(spot => spot.spotNumber === spotNumber) !== undefined) throw new Error("Spot number already exists");
+
+        const newSpot = new ParkingSpot(spotNumber, type)
+        this.spots.push(newSpot)
+
+        return newSpot
+
     }
 
     /**
@@ -238,7 +318,10 @@ class ParkingLot {
      * - Retorna el espacio encontrado o null si no hay disponible
      */
     findAvailableSpot(vehicleType) {
-        throw new Error('Method findAvailableSpot not implemented');
+        if (vehicleType.trim() === '' || typeof vehicleType !== 'string') throw new Error("Vehicle type must be a string");
+        const find = this.spots.find(spot => spot.isOccupied === false && spot.isCompatible(vehicleType) === true)
+        if (find === undefined) return null
+        else return find
     }
 
     /**
@@ -265,7 +348,18 @@ class ParkingLot {
      * - Retorna el espacio donde se estacionó
      */
     parkVehicle(vehicleType, plate, entryTime) {
-        throw new Error('Method parkVehicle not implemented');
+        if (vehicleType.trim() === '' || typeof vehicleType !== 'string') throw new Error("Vehicle type must be a string");
+        if (plate.trim() === '' || typeof plate !== 'string') throw new Error("Vehicle plate is required");
+        if (!(entryTime instanceof Date)) throw new Error("Entry time must be a Date object");
+
+        const space = this.findAvailableSpot(vehicleType)
+
+
+        if (space !== null) space.parkVehicle(plate, entryTime)
+        else throw new Error("No available spot for this vehicle type");
+
+        return space
+
     }
 
     /**
@@ -291,7 +385,23 @@ class ParkingLot {
      * - Retorna objeto { spot, duration: result.duration, fee: result.fee }
      */
     exitVehicle(plate, exitTime) {
-        throw new Error('Method exitVehicle not implemented');
+        if (plate.trim() === '' || typeof plate !== 'string') throw new Error("Vehicle plate is required");
+        if (!(exitTime instanceof Date)) throw new Error("Exit time must be a Date object");
+
+        const FindAuto = this.spots.find(spot => spot.vehiclePlate === plate)
+        if (FindAuto === undefined) throw new Error("Vehicle not found");
+
+        const pricePerHour = this.hourlyRates[FindAuto.type]
+        const pay = FindAuto.exitVehicle(exitTime, pricePerHour)
+
+        this.revenue[FindAuto.type] += pay.fee
+
+        return {
+            spot: FindAuto,
+            duration: pay.duration,
+            fee: pay.fee
+
+        }
     }
 
     /**
@@ -310,7 +420,11 @@ class ParkingLot {
      * - Retorna el porcentaje calculado
      */
     getOccupancyRate() {
-        throw new Error('Method getOccupancyRate not implemented');
+        if (this.spots.length === 0) return 0
+        const spaceFill = (this.spots.filter(spot => spot.isOccupied === true)).length
+        const porcent = parseFloat(((spaceFill / this.spots.length) * 100).toFixed(2))
+        return porcent
+
     }
 
     /**
@@ -326,7 +440,8 @@ class ParkingLot {
      * - Esto asegura que no se modifique el objeto original desde fuera
      */
     getRevenueByType() {
-        throw new Error('Method getRevenueByType not implemented');
+        const copyReve = { ...this.revenue }
+        return copyReve
     }
 
     /**
@@ -345,9 +460,42 @@ class ParkingLot {
      * - Retorna el nuevo array filtrado
      */
     getSpotsByType(type) {
-        throw new Error('Method getSpotsByType not implemented');
+        if (!(['compact', 'standard', 'large'].includes(type))) throw new Error(`Spot type must be 'compact', 'standard', or 'large'`);
+        return this.spots.filter(spot => spot.type === type)
+
     }
 }
+
+
+
+// const estacionamiento1 = new ParkingSpot('1', 'standard')
+// console.log(estacionamiento1.parkVehicle('A1285SD', new Date()))
+// console.log(estacionamiento1.calculateFee(new Date('2026-02-20'), 15))
+// console.log(estacionamiento1.getParkingDuration(new Date('2026-02-20')))
+// console.log(estacionamiento1.exitVehicle(new Date('2026-02-20'), 15))
+// console.log(estacionamiento1.isCompatible('large'))
+// console.log(estacionamiento1)
+
+
+// const parkingGrande = new ParkingLot('estacionamiento Grande')
+// console.log(parkingGrande.addSpot('1', 'standard'))
+// console.log(parkingGrande.addSpot('2', 'standard'))
+// console.log(parkingGrande.addSpot('3', 'large'))
+// console.log(parkingGrande.findAvailableSpot('standard'))
+// console.log(parkingGrande)
+// console.log(parkingGrande.parkVehicle('standard', 'asd544', new Date()))
+// console.log(parkingGrande.exitVehicle('asd544', new Date('2026-03-12')))
+// console.log(parkingGrande.getOccupancyRate())
+// console.log(parkingGrande.getRevenueByType())
+// console.log('//////////////////////')
+// console.log(parkingGrande.getSpotsByType('standard'))
+// console.log(parkingGrande)
+
+
+const spot = new ParkingSpot('A1', 'standard');
+console.log(spot)
+// console.log(spot.isCompatible(123))
+
 
 module.exports = {
     ParkingSpot,

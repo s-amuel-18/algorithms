@@ -38,7 +38,18 @@ class Menu {
      * - Asigna los valores validados a this.name y this.description
      */
     constructor(name, description) {
-        throw new Error('Menu constructor not implemented');
+        if (name === '' || typeof name !== 'string') throw new Error('Menu name is required')
+        const nameFixed = name.trim()
+        if (nameFixed === '') throw new Error('Menu name is required')
+
+        if (description === '' || typeof description !== 'string') throw new Error('Menu description is required')
+        const descriptionFixed = description.trim()
+        if (descriptionFixed === '') throw new Error('Menu description is required')
+
+        this.dishes = []
+        this.name = nameFixed
+        this.description = descriptionFixed
+
     }
 
     /**
@@ -63,13 +74,23 @@ class Menu {
      * - Lanza error "Dish category is required" si la categoría es inválida
      * - Valida que dish.stock sea un número mayor o igual a 0
      * - Lanza error "Dish stock must be greater than or equal to 0" si el stock es inválido
+     * 
      * - Usa findDish() para verificar si ya existe un plato con ese nombre
      * - Si el plato existe, lanza un error con el mensaje: "Dish already exists"
      * - Agrega el plato al array this.dishes usando push()
      * - Retorna el plato agregado
      */
     addDish(dish) {
-        throw new Error('Method addDish not implemented');
+        if (!(dish instanceof Object)) throw new Error('lo ingresado no es un objeto')
+        if (dish.name === '' || typeof dish.name !== 'string') throw new Error('Dish name is required')
+        if (dish.price <= 0) throw new Error('Dish price must be greater than 0')
+        if (dish.category === '' || typeof dish.category !== 'string') throw new Error('Dish category is required')
+        if (dish.stock < 0) throw new Error('Dish stock must be greater than or equal to 0')
+
+        const validationDish = this.findDish(dish.name)
+        if (validationDish instanceof Object) throw new Error('Dish already exists')
+        this.dishes.push(dish)
+        return dish
     }
 
     /**
@@ -87,7 +108,9 @@ class Menu {
      * - Retorna el plato encontrado o null si no se encuentra
      */
     findDish(dishName) {
-        throw new Error('Method findDish not implemented');
+        const validationDish = this.dishes.find(arry => arry.name === dishName)
+        if (validationDish === undefined) return null
+        else return validationDish
     }
 
     /**
@@ -108,7 +131,11 @@ class Menu {
      * - Retorna true si se eliminó correctamente
      */
     removeDish(dishName) {
-        throw new Error('Method removeDish not implemented');
+        const validationName = this.dishes.find(dish => dish.name === dishName)
+        if (validationName === undefined) throw new Error('Dish not found')
+        const dishIndex = this.dishes.findIndex(val => val.name === dishName)
+        this.dishes.splice(dishIndex, 1)
+        return true
     }
 
     /**
@@ -126,7 +153,8 @@ class Menu {
      * - Retorna el nuevo array filtrado
      */
     getAvailableDishes() {
-        throw new Error('Method getAvailableDishes not implemented');
+        const allArry = this.dishes.filter(dish => dish.stock > 0)
+        return allArry
     }
 
     /**
@@ -145,7 +173,8 @@ class Menu {
      * - Retorna el nuevo array filtrado
      */
     getDishesByCategory(category) {
-        throw new Error('Method getDishesByCategory not implemented');
+        const categoryDishes = this.dishes.filter(dishes => dishes.category === category)
+        return categoryDishes
     }
 }
 
@@ -175,7 +204,16 @@ class Order {
      * - Asigna los valores validados a this.tableNumber y this.waiterName
      */
     constructor(tableNumber, waiterName) {
-        throw new Error('Order constructor not implemented');
+        if (tableNumber <= 0) throw new Error('Table number must be greater than 0')
+        if (waiterName === '' || typeof waiterName !== 'string') throw new Error('Waiter name is required')
+        const waiterFixed = waiterName.trim()
+        if (waiterFixed === '') throw new Error('Waiter name is required')
+
+
+        this.items = []
+        this.completed = false
+        this.tableNumber = tableNumber
+        this.waiterName = waiterFixed
     }
 
     /**
@@ -195,17 +233,38 @@ class Order {
      * - Lanza error "Menu must be an instance of Menu" si es inválido
      * - Usa menu.findDish() para buscar el plato
      * - Si el plato no existe, lanza un error: "Dish not found in menu"
-     * - Valida que quantity sea un número mayor que 0
+     * - Valida que quantity sea un número mayor que 0     * 
      * - Lanza error "Quantity must be greater than 0" si la cantidad es inválida
-     * - Verifica que dish.stock >= quantity (stock suficiente)
+     * - Verifica que dish.stock >= quantity (stock suficiente)     * 
      * - Lanza error "Insufficient stock" si no hay stock suficiente
      * - Busca si el plato ya está en this.items usando find()
+     * 
      * - Si existe, suma la cantidad al item existente
      * - Si no existe, agrega un nuevo item: { dishName, quantity, price: dish.price }
      * - Retorna true si se agregó correctamente
      */
     addItem(menu, dishName, quantity) {
-        throw new Error('Method addItem not implemented');
+        if (!(menu instanceof Menu)) throw new Error('Menu must be an instance of Menu')
+        const validationDish = menu.findDish(dishName)
+        if (validationDish === null) throw new Error('Dish not found in menu')
+        if (quantity <= 0) throw new Error('Quantity must be greater than 0')
+        if (validationDish.stock < quantity) throw new Error('Insufficient stock')
+
+        const validationItems = this.items.find(plato => plato.dishName === dishName)
+
+        if (validationItems === undefined) {
+            this.items.push({
+                dishName: dishName,
+                quantity: quantity,
+                price: validationDish.price
+
+            })
+            return true
+        } else {
+            const validationItemsIndex = this.items.findIndex(plato => plato.dishName === dishName)
+            return this.items[validationItemsIndex].quantity += quantity 
+        }
+
     }
 
     /**
@@ -224,7 +283,10 @@ class Order {
      * - Retorna true si se eliminó correctamente
      */
     removeItem(dishName) {
-        throw new Error('Method removeItem not implemented');
+        const findItem = this.items.findIndex(dish => dish.dishName === dishName)
+        if (findItem === -1) return false
+        this.items.splice(findItem, 1)
+        return true
     }
 
     /**
@@ -243,7 +305,11 @@ class Order {
      * - Si no hay items, retorna 0
      */
     calculateSubtotal() {
-        throw new Error('Method calculateSubtotal not implemented');
+        if (this.items.length === 0) return 0
+        return this.items.reduce((acumulador, item) => {
+            return acumulador + (item.price * item.quantity)
+        }, 0)
+
     }
 
     /**
@@ -260,7 +326,9 @@ class Order {
      * - Retorna el monto de impuestos
      */
     calculateTaxes() {
-        throw new Error('Method calculateTaxes not implemented');
+        const subTotal = this.calculateSubtotal()
+        const taxes = subTotal * 0.08
+        return taxes
     }
 
     /**
@@ -278,7 +346,10 @@ class Order {
      * - Retorna el total
      */
     calculateTotal() {
-        throw new Error('Method calculateTotal not implemented');
+        const subtotal = this.calculateSubtotal()
+        const taxes = this.calculateTaxes()
+        const AllPay = subtotal + taxes
+        return AllPay
     }
 
     /**
@@ -294,7 +365,8 @@ class Order {
      * - Retorna true
      */
     markAsCompleted() {
-        throw new Error('Method markAsCompleted not implemented');
+        this.completed = true
+        return true
     }
 }
 
@@ -321,7 +393,13 @@ class Restaurant {
      * - Asigna el nombre validado a this.name
      */
     constructor(name) {
-        throw new Error('Restaurant constructor not implemented');
+        if (typeof name !== 'string') throw new Error('Restaurant name is required')
+        const nameFixed = name.trim()
+        if (nameFixed === '') throw new Error('Restaurant name is required')
+
+        this.menus = []
+        this.orders = []
+        this.name = nameFixed
     }
 
     /**
@@ -340,7 +418,9 @@ class Restaurant {
      * - Retorna el menú agregado
      */
     addMenu(menu) {
-        throw new Error('Method addMenu not implemented');
+        if (!(menu instanceof Menu)) throw new Error('Menu must be an instance of Menu')
+        this.menus.push(menu)
+        return menu
     }
 
     /**
@@ -359,7 +439,9 @@ class Restaurant {
      * - Retorna la orden creada
      */
     createOrder(tableNumber, waiterName) {
-        throw new Error('Method createOrder not implemented');
+        const createOrder = new Order(tableNumber, waiterName)
+        this.orders.push(createOrder)
+        return createOrder
     }
 
     /**
@@ -377,7 +459,8 @@ class Restaurant {
      * - Retorna la orden en el índice especificado
      */
     getOrder(orderIndex) {
-        throw new Error('Method getOrder not implemented');
+        if (!(orderIndex >= 0 && orderIndex < this.orders.length)) return null
+        return this.orders[orderIndex]
     }
 
     /**
@@ -395,7 +478,8 @@ class Restaurant {
      * - Retorna el nuevo array filtrado
      */
     getActiveOrders() {
-        throw new Error('Method getActiveOrders not implemented');
+        const ordersActive = this.orders.filter(active => active.completed === false)
+        return ordersActive
     }
 
     /**
@@ -415,9 +499,63 @@ class Restaurant {
      * - Si no hay órdenes completadas, retorna 0
      */
     getRevenue() {
-        throw new Error('Method getRevenue not implemented');
+        const ordersCompleted = this.orders.filter(order => order.completed === true)
+        return ordersCompleted.reduce((count, pagos) => {
+            return count + (pagos.calculateTotal())
+        }, 0)
     }
 }
+
+
+
+const menu1 = new Menu('Menu Principal', 'comida candela creada por armando el papi')
+menu1.addDish({
+    name: 'Pasta Carbonara',
+    price: 16.50,
+    category: 'Main Course',
+    stock: 1000
+})
+menu1.addDish({
+    name: 'Pasta putanesca',
+    price: 15.99,
+    category: 'Sweet',
+    stock: 10
+})
+console.log(menu1)
+
+const mesonero1 = new Order(1, 'Samuel Graterol')
+console.log(mesonero1.addItem(menu1, 'Pasta Carbonara', 5))
+console.log(mesonero1.addItem(menu1, 'Pasta Carbonara', 5))
+console.log('//////////////////////')
+console.log(mesonero1.removeItem('Pasta'))
+console.log(mesonero1.calculateSubtotal())
+console.log(mesonero1.calculateTaxes())
+console.log(mesonero1.calculateTotal())
+console.log(mesonero1.markAsCompleted())
+console.log(mesonero1)
+
+const restaurant1 = new Restaurant('La granDota')
+console.log(restaurant1)
+restaurant1.addMenu(menu1)
+console.log(restaurant1.createOrder(2, 'Erick Toro'))
+console.log(restaurant1.getOrder(0), '////////')
+console.log(restaurant1.getActiveOrders())
+console.log(restaurant1.orders[0].addItem(menu1, 'Pasta putanesca', 2))
+console.log(restaurant1.orders[0].addItem(menu1, 'Pasta putanesca', 2))
+console.log(restaurant1.orders[0].markAsCompleted())
+console.log(restaurant1.orders[0].items)
+console.log(restaurant1.getRevenue())
+
+console.log('//////////////////////')
+// console.log(menu1.removeDish('Plato Inexistente'))
+console.log('//////////////////////')
+console.log(restaurant1.orders[0])
+
+
+
+
+
+
 
 module.exports = {
     Menu,

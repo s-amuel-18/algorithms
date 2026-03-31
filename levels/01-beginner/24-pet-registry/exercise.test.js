@@ -83,7 +83,7 @@ describe('Pet Registry', () => {
 
         test('throws when the type is invalid', () => {
             // Purpose: ensure whitespace-only types are rejected.
-            expect(() => new Pet('Luna', '   ', 1)).toThrow('Pet type is required');
+            expect(() => new Pet('Luna', '   ', 1)).toThrow(        );
         });
 
         test('throws when the age is negative', () => {

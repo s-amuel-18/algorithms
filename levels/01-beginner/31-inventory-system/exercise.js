@@ -11,6 +11,8 @@
  * - Uso de métodos de arrays: find, filter, reduce
  */
 
+const { SearchSource } = require("jest")
+
 /**
  * Representa un producto individual en el inventario.
  * Traducción: Producto
@@ -41,9 +43,26 @@ class Product {
      * - Asigna los valores validados a this.name, this.price, this.quantity, this.category
      */
     constructor(name, price, quantity, category) {
-        throw new Error('Product constructor not implemented');
+        if (typeof name !== 'string') throw new Error('el nombre ingresado no es valido')
+        let FixedName = name.trim()
+        if (FixedName == '') throw new Error('Product name is required')
+
+        if (!(price > 0)) throw new Error('Product price must be greater than 0Product price must be greater than 0')
+        if (!(quantity >= 0)) throw new Error('Product quantity must be greater than or equal to 0')
+
+        if (!(typeof category === 'string')) throw new Error('el valor de category no es un estring')
+        let categoryfixed = category.trim()
+        if (categoryfixed === '') throw new Error('Product category is required')
+
+
+        this.name = FixedName
+        this.price = price
+        this.quantity = quantity
+        this.category = categoryfixed
     }
 }
+
+
 
 /**
  * Gestiona un inventario de productos.
@@ -60,8 +79,10 @@ class Inventory {
      * TODO:
      * - Inicializa this.products como un array vacío []
      */
+
+    products = []
     constructor() {
-        throw new Error('Inventory constructor not implemented');
+
     }
 
     /**
@@ -86,7 +107,16 @@ class Inventory {
      * - Retorna el producto creado
      */
     addProduct(name, price, quantity, category) {
-        throw new Error('Method addProduct not implemented');
+        const valor = this.findProduct(name)
+        if (valor !== null) {
+            if (valor.name === name) throw new Error('Product already exists')
+        }
+        const producto = new Product(name, price, quantity, category)
+        this.products.push(producto)
+
+
+        return producto
+
     }
 
     /**
@@ -105,7 +135,11 @@ class Inventory {
      * - Retorna el producto encontrado o null si no se encuentra
      */
     findProduct(name) {
-        throw new Error('Method findProduct not implemented');
+        const producfound = this.products.find(seacrh => seacrh.name === name)
+        if (producfound === undefined) return null
+
+        return producfound
+
     }
 
     /**
@@ -129,7 +163,12 @@ class Inventory {
      * - Retorna el producto actualizado
      */
     sellProduct(name, quantity) {
-        throw new Error('Method sellProduct not implemented');
+        const product = this.findProduct(name)
+        if (product === null) throw new Error('Product not found')
+        if (product.quantity < quantity) throw new Error('Insufficient stock')
+
+        product.quantity -= quantity
+        return product
     }
 
     /**
@@ -153,15 +192,17 @@ class Inventory {
      * - Retorna el producto actualizado
      */
     restockProduct(name, quantity) {
-        throw new Error('Method restockProduct not implemented');
+        const product = this.findProduct(name)
+        if (product === null) throw new Error('Product not found')
+        if (quantity <= 0) throw new Error('Quantity must be greater than 0')
+
+        product.quantity += quantity
+        return product
     }
 
     /**
-     * Calcula el valor total del inventario usando reduce().
-     * Traducción: Obtener Valor Total
-     *
-     * Este método calcula el valor total multiplicando precio × cantidad de cada producto
-     * y sumando todos los valores. Debe usar el método reduce() del array para realizar el cálculo.
+     * Calcula el valor total del inventario usando reduce(
+     *      * y sumando todos los valores. Debe usar el método reduce() del array para realizar el cálculo.
      *
      * @returns {number} El valor total del inventario (precio × cantidad de todos los productos)
      *
@@ -172,7 +213,10 @@ class Inventory {
      * - Retorna el valor total calculado
      */
     getTotalValue() {
-        throw new Error('Method getTotalValue not implemented');
+        if (this.products.length === 0) return 0
+        const sumTotal = this.products.reduce((b, a) => b += (a.price * a.quantity), 0)
+
+        return sumTotal
     }
 
     /**
@@ -191,7 +235,9 @@ class Inventory {
      * - Retorna el nuevo array filtrado
      */
     getLowStockProducts(threshold) {
-        throw new Error('Method getLowStockProducts not implemented');
+        const arryProducts = this.products.filter(filtro => filtro.quantity <= threshold)
+
+        return arryProducts
     }
 
     /**
@@ -210,9 +256,17 @@ class Inventory {
      * - Retorna el nuevo array filtrado
      */
     getProductsByCategory(category) {
-        throw new Error('Method getProductsByCategory not implemented');
+        const filterCategory = this.products.filter(product => product.category === category)
+        return filterCategory
     }
 }
+
+const invent = new Inventory()
+invent.addProduct('pepito', 1, 1, '  salon   ')
+invent.addProduct('cafe', 22, 1, '  comida   ')
+
+console.log(invent)
+console.log(invent.getTotalValue(),'aquiiiiiiiiiii')
 
 module.exports = {
     Product,

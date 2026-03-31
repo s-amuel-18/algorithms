@@ -43,7 +43,15 @@ class Song {
      * - Asigna los valores validados a las propiedades correspondientes
      */
     constructor(title, artist, duration, genre) {
-        throw new Error('Song constructor not implemented');
+        if (title.trim() === '' || typeof title !== 'string') throw new Error("Song title is required");
+        if (artist.trim() === '' || typeof artist !== 'string') throw new Error("Song artist is required");
+        if (duration <= 0) throw new Error("Song duration must be greater than 0");
+        if (genre.trim() === '' || typeof genre !== 'string') throw new Error("Song genre is required");
+
+        this.title = title
+        this.artist = artist
+        this.duration = duration
+        this.genre = genre
     }
 
     /**
@@ -56,7 +64,7 @@ class Song {
      * - Retorna this.duration
      */
     getDuration() {
-        throw new Error('Method getDuration not implemented');
+        return this.duration
     }
 
     /**
@@ -69,7 +77,7 @@ class Song {
      * - Retorna this.artist
      */
     getArtist() {
-        throw new Error('Method getArtist not implemented');
+        return this.artist
     }
 
     /**
@@ -82,7 +90,7 @@ class Song {
      * - Retorna this.genre
      */
     getGenre() {
-        throw new Error('Method getGenre not implemented');
+        return this.genre
     }
 
     /**
@@ -100,7 +108,10 @@ class Song {
      * - Retorna el string formateado como "MM:SS"
      */
     getFormattedDuration() {
-        throw new Error('Method getFormattedDuration not implemented');
+        const min = (Math.floor(this.duration / 60)).toString().padStart(2, '0')
+        const sec = (this.duration % 60).toString().padStart(2, '0')
+        return `${min}:${sec}`
+
     }
 }
 
@@ -126,7 +137,11 @@ class Playlist {
      * - Asigna el nombre validado a this.name
      */
     constructor(name) {
-        throw new Error('Playlist constructor not implemented');
+        if (name.trim() === '' || typeof name !== 'string') throw new Error("Playlist name is required");
+
+        this.songs = []
+        this.name = name.trim()
+
     }
 
     /**
@@ -148,7 +163,13 @@ class Playlist {
      * - Retorna la canción agregada
      */
     addSong(song) {
-        throw new Error('Method addSong not implemented');
+        if (!(song instanceof Song)) throw new Error("Song must be an instance of Song");
+        if (this.songs.some(songi => songi.title === song.title)) throw new Error("Song already in playlist");
+        else this.songs.push(song)
+
+
+        return song
+
     }
 
     /**
@@ -168,7 +189,12 @@ class Playlist {
      * - Retorna true si se eliminó correctamente
      */
     removeSong(songTitle) {
-        throw new Error('Method removeSong not implemented');
+        const ind = this.songs.findIndex(ind => ind.title === songTitle)
+        console.log(ind, 'chequeo')
+        if (ind !== -1) this.songs.splice(ind, 1)
+        else return false
+
+        return true
     }
 
     /**
@@ -187,7 +213,10 @@ class Playlist {
      * - Si la lista está vacía, retorna 0
      */
     getTotalDuration() {
-        throw new Error('Method getTotalDuration not implemented');
+        if (this.songs.length === 0) return 0
+        return this.songs.reduce((contador, time) => {
+            return contador + (time.getDuration())
+        }, 0)
     }
 
     /**
@@ -206,7 +235,9 @@ class Playlist {
      * - Retorna el nuevo array filtrado
      */
     getSongsByArtist(artist) {
-        throw new Error('Method getSongsByArtist not implemented');
+        const songOfArtist = this.songs.filter(song => song.getArtist() === artist)
+        return songOfArtist
+
     }
 
     /**
@@ -225,7 +256,7 @@ class Playlist {
      * - Retorna el nuevo array filtrado
      */
     getSongsByGenre(genre) {
-        throw new Error('Method getSongsByGenre not implemented');
+        return this.songs.filter(song => song.getGenre() === genre)
     }
 
     /**
@@ -244,7 +275,13 @@ class Playlist {
      * - Retorna true
      */
     shuffle() {
-        throw new Error('Method shuffle not implemented');
+        const shuffled = [...this.songs]
+
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return true
     }
 
     /**
@@ -257,7 +294,7 @@ class Playlist {
      * - Retorna this.songs.length
      */
     getSongCount() {
-        throw new Error('Method getSongCount not implemented');
+        return this.songs.length
     }
 }
 
@@ -284,7 +321,11 @@ class MusicLibrary {
      * - Asigna el nombre validado a this.name
      */
     constructor(name) {
-        throw new Error('MusicLibrary constructor not implemented');
+        if (name.trim() === '' || typeof name !== 'string') throw new Error("Library name is required");
+        this.songs = []
+        this.playlists = []
+        this.name = name.trim()
+
     }
 
     /**
@@ -306,7 +347,13 @@ class MusicLibrary {
      * - Retorna la canción agregada
      */
     addSong(song) {
-        throw new Error('Method addSong not implemented');
+        if (!(song instanceof Song)) throw new Error("Song must be an instance of Song");
+        const validationSong = this.songs.some(songIn => songIn.title === song.title && songIn.artist === song.artist)
+        if (validationSong) throw new Error("Song already exists in library");
+        else this.songs.push(song)
+
+        return song
+
     }
 
     /**
@@ -323,7 +370,9 @@ class MusicLibrary {
      * - Retorna la canción encontrada o null si no se encuentra
      */
     findSong(title) {
-        throw new Error('Method findSong not implemented');
+        const findSong = this.songs.find(song => song.title === title)
+        if (findSong === undefined) return null
+        else return findSong
     }
 
     /**
@@ -341,7 +390,10 @@ class MusicLibrary {
      * - Retorna la lista creada
      */
     createPlaylist(playlistName) {
-        throw new Error('Method createPlaylist not implemented');
+        const newPlaylist = new Playlist(playlistName)
+        this.playlists.push(newPlaylist)
+
+        return newPlaylist
     }
 
     /**
@@ -360,7 +412,7 @@ class MusicLibrary {
      * - Retorna el nuevo array filtrado
      */
     getSongsByArtist(artist) {
-        throw new Error('Method getSongsByArtist not implemented');
+        return this.songs.filter(song => song.artist === artist)
     }
 
     /**
@@ -379,7 +431,7 @@ class MusicLibrary {
      * - Retorna el nuevo array filtrado
      */
     getSongsByGenre(genre) {
-        throw new Error('Method getSongsByGenre not implemented');
+        return this.songs.filter(song => song.genre === genre)
     }
 
     /**
@@ -398,7 +450,10 @@ class MusicLibrary {
      * - Si no hay canciones, retorna 0
      */
     getTotalDuration() {
-        throw new Error('Method getTotalDuration not implemented');
+        if (this.songs.length === 0) return 0
+        return this.songs.reduce((contador, song) => {
+            return contador + (song.getDuration())
+        }, 0)
     }
 
     /**
@@ -417,7 +472,32 @@ class MusicLibrary {
      * - Si hay empate, retorna el primero encontrado
      */
     getMostPopularArtist() {
-        throw new Error('Method getMostPopularArtist not implemented');
+        if (this.songs.length === 0) return null
+        let allArtist = []
+        let max = {}
+        let artist = this.songs.map(song => {
+            const eachArtist = this.getSongsByArtist(song.artist)
+            if (allArtist.find(artist => artist.artist === song.artist) === undefined || allArtist.length === 0) {
+                allArtist.push({
+                    artist: song.artist,
+                    numberSongs: eachArtist.length
+                })
+
+                if (Object.keys(max).length === 0 || eachArtist.length > max.numberSongs) {
+                    max = {
+                        artist: song.artist,
+                        numberSongs: eachArtist.length
+                    }
+                }
+            }
+
+
+        })
+
+        // let numbers =  Math.max(...(allArtist.map(num => num.numberSongs)))
+        // let MaxNumber = Math.max( numbers)
+
+        return max.artist
     }
 
     /**
@@ -437,15 +517,85 @@ class MusicLibrary {
      * - Crea un objeto con las estadísticas solicitadas
      * - totalSongs: this.songs.length
      * - totalPlaylists: this.playlists.length
-     * - totalDuration: usa getTotalDuration()
+     *  - totalDuration: usa getTotalDuration()
      * - artists: cuenta artistas únicos usando Set
      * - genres: cuenta géneros únicos usando Set
      * - Retorna el objeto con todas las estadísticas
      */
     getStatistics() {
-        throw new Error('Method getStatistics not implemented');
+        const artistSet = new Set()
+        const genreSet = new Set()
+        this.songs.forEach(art => artistSet.add(art.artist))
+        this.songs.forEach(genr => genreSet.add(genr.genre))
+        return {
+            totalSongs: this.songs.length,
+            totalPlaylists: this.playlists.length,
+            totalDuration: this.getTotalDuration(),
+            artists: artistSet.size,
+            genres : genreSet.size
+        }
     }
 }
+
+
+// const veneca = new Song('veneca', 'Raguayana', 200, 'reggue')
+// const vida = new Song('vida', 'canserbero', 375, 'rap')
+// const muerte = new Song('muerte', 'canserbero', 400, 'rap')
+// const limfao = new Song('shufel', 'limfao', 720, 'pop')
+// console.log(veneca.getFormattedDuration())
+// console.log(vida.getFormattedDuration())
+
+// const play1 = new Playlist('la rompedora')
+// console.log(play1.addSong(veneca))
+// console.log(play1.addSong(vida))
+// console.log(play1.addSong(muerte))
+// // console.log(play1.removeSong('veneca'))
+// console.log(play1.getTotalDuration())
+// console.log(play1.getSongsByArtist('canserbero'))
+// console.log(play1.getSongsByGenre('reggue'))
+// console.log(play1.shuffle(), 'chequeoooooo')
+// console.log(play1.getSongCount())
+// console.log(play1)
+
+// console.log('??????????')
+// console.log('??????????')
+// console.log('??????????')
+// console.log('??????????')
+// const libreria = new MusicLibrary('musiquita Chill')
+// console.log(libreria)
+// console.log(libreria.addSong(limfao), 'AGREGADO')
+// console.log(libreria.addSong(veneca), 'AGREGADO')
+// console.log(libreria.addSong(vida), 'AGREGADO')
+// console.log(libreria.addSong(muerte), 'AGREGADO')
+// console.log(libreria.findSong(veneca.title), 'ENCONTRADO')
+// console.log(libreria.createPlaylist('musiquita'))
+// console.log(libreria.getSongsByArtist('canserbero'))
+// console.log(libreria.getSongsByGenre('reggue'))
+// console.log(libreria.getTotalDuration())
+// console.log(libreria.getMostPopularArtist())
+// console.log(libreria.getStatistics())
+// console.log(libreria)
+
+
+const library = new MusicLibrary('Mi Biblioteca');
+console.log(library)
+console.log(library.name == 'Mi Biblioteca')
+
+
+// const library = new MusicLibrary('Test');
+// const playlist = library.createPlaylist('Mis Favoritas');
+// console.log(library.playLists.length)
+// console.log(playlist.name === 'Mis Favoritas')
+
+// const library = new MusicLibrary('Test');
+// const song1 = new Song('Song 1', 'Artist A', 180, 'Pop');
+// const song2 = new Song('Song 2', 'Artist B', 200, 'Rock');
+// library.addSong(song1);
+// library.addSong(song2);
+// library.createPlaylist('Playlist 1');
+// const stats = library.getStatistics();
+// console.log(stats)
+
 
 module.exports = {
     Song,

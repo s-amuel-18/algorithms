@@ -246,7 +246,7 @@ describe('Sistema de Gestión de Cursos Online', () => {
             student1.completeCourse('C001');
             student2.completeCourse('C001');
             
-            expect(course.getCompletionRate()).toBe(50.00);
+            expect(course.getCompletionRate()).toBe(50);
         });
 
         test('debe encontrar el curso más popular correctamente', () => {

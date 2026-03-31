@@ -199,8 +199,8 @@ describe('Sistema de Gestión de Eventos y Calendario', () => {
                 // Entrada: category='Work'
                 // Esperado: Retorna solo eventos de esa categoría
                 const calendar = new Calendar('Juan Pérez');
-                const event1 = new Event('Evento 1', 'Desc', new Date(), new Date(), 'Work');
-                const event2 = new Event('Evento 2', 'Desc', new Date(), new Date(), 'Personal');
+                const event1 = new Event('Evento 1', 'Desc', new Date('2026-10-10'), new Date('2026-10-11'), 'Work');
+                const event2 = new Event('Evento 2', 'Desc', new Date('2026-10-15'), new Date('2026-10-20'), 'Personal');
                 calendar.addEvent(event1);
                 calendar.addEvent(event2);
                 const workEvents = calendar.getEventsByCategory('Work');
@@ -272,8 +272,8 @@ describe('Sistema de Gestión de Eventos y Calendario', () => {
                 // Entrada: Calendario con varios eventos
                 // Esperado: Objeto con todas las estadísticas solicitadas
                 const calendar = new Calendar('Juan Pérez');
-                const event1 = new Event('Evento 1', 'Desc', new Date(), new Date(), 'Work');
-                const event2 = new Event('Evento 2', 'Desc', new Date(), new Date(), 'Personal');
+                const event1 = new Event('Evento 1', 'Desc', new Date('2026-10-10'), new Date('2026-10-11'), 'Work');
+                const event2 = new Event('Evento 2', 'Desc', new Date('2026-10-15'), new Date('2026-10-16'), 'Personal');
                 calendar.addEvent(event1);
                 calendar.addEvent(event2);
                 const summary = calendar.getCalendarSummary();

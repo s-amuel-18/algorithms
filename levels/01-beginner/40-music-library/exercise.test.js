@@ -233,7 +233,7 @@ describe('Sistema de Gestión de Biblioteca de Música', () => {
                 // Entrada: name='Mi Biblioteca'
                 // Esperado: MusicLibrary creada con name correcto, arrays inicializados
                 const library = new MusicLibrary('Mi Biblioteca');
-                expect(library.name).toBe('Mi Biblioteca');
+                expect(library.name === 'Mi Biblioteca').toBe(true);
                 expect(Array.isArray(library.songs)).toBe(true);
                 expect(Array.isArray(library.playlists)).toBe(true);
             });

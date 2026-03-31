@@ -35,7 +35,22 @@
  * - Después del delay, llama resolve("Delay completed")
  */
 function delay(ms) {
-    throw new Error('Function delay not implemented');
+    // return console.log(Number.isFinite(ms))
+    if (!(Number.isFinite(ms))) return Promise.reject(new Error('Delay must be a number'))
+    if (ms < 0) return Promise.reject(new Error('Delay must be greater than or equal to 0'))
+
+
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve('Delay completed')
+            console.log('Delay completed')
+        }, ms);
+    },)
+
+
+
+
+
 }
 
 /**
@@ -59,7 +74,26 @@ function delay(ms) {
  * - Después del delay, resuelve con objeto: { id: userId, name: "User " + userId, email: "user" + userId + "@example.com" }
  */
 function fetchUserData(userId) {
-    throw new Error('Function fetchUserData not implemented');
+    const notViable = [null, undefined, '']
+    if (notViable.includes(userId)) return Promise.reject(new Error('User ID is required'))
+
+    // return new Promise((resolve) => {
+    //     setTimeout(() => {
+    //         resolve('Delay completed')
+    //         console.log('Delay completed')
+    //     }, 500);
+    // },)
+
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve(
+                { id: userId, name: "User " + userId, email: "user" + userId + "@example.com" }
+            )
+            // console.log(
+            //     { id: userId, name: "User " + userId, email: "user" + userId + "@example.com" }
+            // )
+        }, 500);
+    }, 500)
 }
 
 /**
@@ -82,7 +116,15 @@ function fetchUserData(userId) {
  * - Después del delay, resuelve con "Processed: " + String(data)
  */
 function processData(data) {
-    throw new Error('Function processData not implemented');
+    const validation = [null, undefined]
+    if (validation.includes(data)) return Promise.reject(new Error('Data is required'))
+
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve('Processed: ' + String(data))
+            console.log('Processed: ' + String(data))
+        }, 300);
+    })
 }
 
 /**
@@ -108,7 +150,16 @@ function processData(data) {
  * - Opcional: Agrega .catch() para manejar errores y re-lanzarlos con throw error
  */
 function handleAsyncOperation(userId) {
-    throw new Error('Function handleAsyncOperation not implemented');
+    if (userId === '')return Promise.reject(new Error('User ID is required'))
+
+        return fetchUserData(userId)
+            .then((userData => {
+                return processData(userData.name)
+            }))
+            .catch(error => {
+                throw error
+            })
+
 }
 
 /**
@@ -134,7 +185,14 @@ function handleAsyncOperation(userId) {
  * - En el catch, re-lanza el error con throw error
  */
 async function handleAsyncOperationWithAwait(userId) {
-    throw new Error('Function handleAsyncOperationWithAwait not implemented');
+    try {
+        const user = await fetchUserData(userId)
+        const process = await processData(user.name)
+        return process
+    } catch (error) {
+        throw error;
+
+    }
 }
 
 /**
@@ -162,8 +220,94 @@ async function handleAsyncOperationWithAwait(userId) {
  * - Retorna el resultado de Promise.all()
  */
 function fetchMultipleUsers(userIds) {
-    throw new Error('Function fetchMultipleUsers not implemented');
+    if (!(Array.isArray(userIds))) return Promise.reject(new Error('User IDs must be an array'))
+    if (userIds.length === 0) return Promise.reject(new Error('User IDs array cannot be empty'))
+
+    const promises = userIds.map(user => fetchUserData(user))
+    return Promise.all(promises)
+
 }
+
+
+///// Estados
+// Promise()
+// pending pendiente
+// fullfield resuelto
+// rejected no se resolvio
+//
+// Callbacks
+// resolve se solventa la promesa
+// rejected no se resuelve la promesa
+
+// then()
+// catch()
+
+// const promesa = new Promise((resolve, reject) => {
+//     setTimeout(() => {
+//         let operationSuccesssful = true
+
+//         if (!operationSuccesssful) {
+//             resolve('la operacion fue exitosa')
+//         } else (
+//             reject('fallo la operacion')
+//         )
+//     }, 2000);
+// })
+
+// promesa
+//     .then(successfullMesage => {
+//         console.log(successfullMesage)
+//     })
+//     .catch(errorMesage => {
+//         console.log(errorMesage)
+//     })
+
+
+
+
+// ////
+// function fetchData () {
+//     fetch('https://rickandmortyapi.com/api/character')
+//     .then((response) => response.json())
+//     .then( data => console.log(data))
+//     .catch(error => console.log(error))
+// }
+
+// const personajes = fetchData()
+// console.log(personajes.results)
+
+
+
+// const urls = [
+//     "https://rickandmortyapi.com/api/character",
+//     "https://rickandmortyapi.com/api/location",
+//     "https://rickandmortyapi.com/api/episode",
+// ];
+
+// async function fetchNewData() {
+//     try {
+//         for await (let url of urls) {
+//             let response = await fetch(url)
+//             let data = await response.json()
+
+//             console.log(data)
+//         }
+//     } catch (error) {
+//         console.log(error)
+//     }
+// }
+
+// fetchNewData()
+
+
+
+// console.log(delay(1200))
+// console.log(fetchUserData('armando'))
+// console.log(processData('hello'))
+// console.log(handleAsyncOperation('armando'))
+
+
+console.log(fetchMultipleUsers(['1654546', '546465', '684+8']))
 
 module.exports = {
     delay,

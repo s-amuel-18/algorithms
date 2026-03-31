@@ -8,6 +8,8 @@ const {
     cleanText
 } = require('./exercise');
 
+
+
 describe('Búsqueda de Palabras en Texto', () => {
     
     const sampleText = "El gato negro está en el jardín. El gato es muy inteligente y el jardín es hermoso.";

@@ -15,9 +15,24 @@
  * sumEvenNumbers([-2, -4, 1, 3]) => -6 (-2 + -4)
  */
 
+// const countVowels = require("../06-count-vowels/exercise");
+
+let numbers = [2, 4, 6, 8]
+
 function sumEvenNumbers(numbers) {
+    count = 0
+    for (let i = 0; i < numbers.length; i++) {
+        if (numbers[i] % 2 === 0) {
+            count += numbers[i]
+        } else {
+            continue
+        }
+    }
+console.log(count)
+    return count
     // TODO: Implementa la función aquí
     // Pista: Un número es par si numbers[i] % 2 === 0
 }
 
+sumEvenNumbers(numbers)
 module.exports = sumEvenNumbers;

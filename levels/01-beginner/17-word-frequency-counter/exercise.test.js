@@ -235,7 +235,7 @@ describe('Contador de Frecuencia de Palabras', () => {
     test('debe ser case-insensitive al filtrar', () => {
       const frequencyMap = {
         The: 3,
-        THE: 2,
+         THE: 2,
         programming: 1,
       };
 

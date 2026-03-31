@@ -132,7 +132,7 @@ class Calendar {
 
         // Verifica si el evento ya está en el array
         const eventIndex = this.events.indexOf(event);
-        
+
         // Si el evento ya está en el array, no hay conflicto (puede estar siendo re-agregado)
         if (eventIndex !== -1) {
             return event;

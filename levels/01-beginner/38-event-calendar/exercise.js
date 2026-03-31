@@ -49,7 +49,19 @@ class Event {
      * - Asigna los valores validados a las propiedades correspondientes (usando trim para strings)
      */
     constructor(title, description, startTime, endTime, category) {
-        throw new Error('Event constructor not implemented');
+        if (title.trim() === '' && typeof title === 'string') throw new Error("Event title is required");
+        if (description.trim() === '' && typeof description === 'string') throw new Error("Event description is required");
+        if (!(startTime instanceof Date)) throw new Error("Start time must be a Date object");
+        if (!(endTime instanceof Date)) throw new Error("End time must be a Date object");
+        if (endTime.getTime() < startTime.getTime()) throw new Error("End time must be after start time");
+        if (endTime.getTime() === startTime.getTime()) endTime.setHours(endTime.getHours() + 1)
+        if (category.trim() === '' && typeof category === 'string') throw new Error("Event category is required");
+
+        this.title = title
+        this.description = description
+        this.startTime = startTime
+        this.endTime = endTime
+        this.category = category
     }
 
     /**
@@ -66,7 +78,8 @@ class Event {
      * - Retorna el resultado
      */
     getDuration() {
-        throw new Error('Method getDuration not implemented');
+        const hours = parseFloat(((this.endTime.getTime() - this.startTime.getTime()) / (1000 * 60 * 60)).toFixed(2))
+        return hours
     }
 
     /**
@@ -81,7 +94,8 @@ class Event {
      * - Retorna false en caso contrario
      */
     isAllDay() {
-        throw new Error('Method isAllDay not implemented');
+        if (this.getDuration() === 24) return true
+        else return false
     }
 
     /**
@@ -94,7 +108,7 @@ class Event {
      * - Retorna this.category
      */
     getCategory() {
-        throw new Error('Method getCategory not implemented');
+        return this.category
     }
 
     /**
@@ -116,7 +130,12 @@ class Event {
      * - Retorna true
      */
     updateTime(newStartTime, newEndTime) {
-        throw new Error('Method updateTime not implemented');
+        if (!(newStartTime instanceof Date)) throw new Error("Start time must be a Date object");
+        if (!(newEndTime instanceof Date)) throw new Error("End time must be a Date object");
+        if (newEndTime.getTime() < newStartTime.getTime()) throw new Error("End time must be after start time");
+        this.startTime = newStartTime
+        this.endTime = newEndTime
+        return true
     }
 
     /**
@@ -136,7 +155,9 @@ class Event {
      * - Retorna true si se solapan, false en caso contrario
      */
     overlapsWith(otherEvent) {
-        throw new Error('Method overlapsWith not implemented');
+        if (!(otherEvent instanceof Event)) throw new Error('Other event must be an instance of Event')
+        if (this.startTime < otherEvent.endTime && this.endTime > otherEvent.startTime) return true
+        else return false
     }
 }
 
@@ -161,7 +182,10 @@ class Calendar {
      * - Inicializa this.events como un array vacío
      */
     constructor(ownerName) {
-        throw new Error('Calendar constructor not implemented');
+        if (ownerName.trim() === '' || typeof ownerName !== 'string') throw new Error("Owner name is required");
+        this.ownerName = ownerName.trim()
+        this.events = []
+
     }
 
     /**
@@ -186,7 +210,13 @@ class Calendar {
      * - Retorna el evento agregado
      */
     addEvent(event) {
-        throw new Error('Method addEvent not implemented');
+        if (!(event instanceof Event)) throw new Error("Event must be an instance of Event");
+        if (this.events.indexOf(a => a.title === event.title) !== -1) return event
+        // console.log(this.events.some(event => event.overlapsWith(event)), 'chequeos')
+        if (this.events.some(element => element.overlapsWith(event))) throw new Error("Event conflicts with existing event");
+        else this.events.push(event)
+
+        return event
     }
 
     /**
@@ -203,7 +233,10 @@ class Calendar {
      * - Retorna true
      */
     removeEvent(event) {
-        throw new Error('Method removeEvent not implemented');
+        const find = this.events.findIndex(eve => eve.title === event.title && eve.startTime.getTime() === event.startTime.getTime())
+        if (find === -1) return false
+        this.events.splice(find, 1)
+        return true
     }
 
     /**
@@ -219,7 +252,8 @@ class Calendar {
      * - Retorna el evento en el índice especificado
      */
     findEvent(eventIndex) {
-        throw new Error('Method findEvent not implemented');
+        if (eventIndex >= 0 && eventIndex < this.events.length) return this.events[eventIndex]
+        else return null
     }
 
     /**
@@ -238,7 +272,12 @@ class Calendar {
      * - Retorna el array filtrado
      */
     getEventsByDate(date) {
-        throw new Error('Method getEventsByDate not implemented');
+        if (!(date instanceof Date)) throw new Error("Date must be a Date object");
+        return this.events.filter(eve => eve.startTime.getUTCFullYear() === date.getUTCFullYear() && eve.startTime.getUTCMonth() === date.getUTCMonth() && eve.startTime.getUTCDate() === date.getUTCDate())
+
+
+
+
     }
 
     /**
@@ -254,7 +293,7 @@ class Calendar {
      * - Retorna el array filtrado
      */
     getEventsByCategory(category) {
-        throw new Error('Method getEventsByCategory not implemented');
+        return this.events.filter(eve => eve.getCategory() === category)
     }
 
     /**
@@ -275,7 +314,9 @@ class Calendar {
      * - Retorna el array filtrado
      */
     getEventsByDateRange(startDate, endDate) {
-        throw new Error('Method getEventsByDateRange not implemented');
+        if (!(startDate instanceof Date)) throw new Error("Start date must be a Date object");
+        if (!(endDate instanceof Date)) throw new Error("End date must be a Date object");
+        return this.events.filter(eve => startDate.getDate() < eve.startTime.getTime() && endDate.getTime() >= eve.endTime.getTime())
     }
 
     /**
@@ -293,7 +334,11 @@ class Calendar {
      * - Retorna true si hay conflicto, false en caso contrario
      */
     hasConflict(event) {
-        throw new Error('Method hasConflict not implemented');
+        return this.events.some(eve => {
+            if (eve.title === event.title) return false
+            if (eve.overlapsWith(event)) return true
+            else return false
+        })
     }
 
     /**
@@ -313,7 +358,13 @@ class Calendar {
      * - Retorna el array filtrado
      */
     getUpcomingEvents(days) {
-        throw new Error('Method getUpcomingEvents not implemented');
+        if (days <= 0) throw new Error("Days must be greater than 0");
+        const today = new Date()
+        const NextDays = new Date()
+        NextDays.setDate(today.getDate() + days)
+
+        return this.events.filter(eve => NextDays.getTime() >= eve.startTime.getTime() && eve.startTime.getTime() >= today.getTime())
+
     }
 
     /**
@@ -333,7 +384,23 @@ class Calendar {
      * - Retorna el array de fechas
      */
     getBusyDays() {
-        throw new Error('Method getBusyDays not implemented');
+        const fechasUnicas = new Set()
+        this.events.forEach(eve => {
+            // console.log(eve.startTime)
+
+            const dateOnly = new Date(
+                eve.startTime.getFullYear(),
+                eve.startTime.getMonth(),
+                eve.startTime.getDate()
+            )
+            // console.log(dateOnly)
+
+            fechasUnicas.add(dateOnly.getTime())
+
+
+        })
+        console.log(fechasUnicas)
+        return Array.from(fechasUnicas).map(eve => new Date(eve))
     }
 
     /**
@@ -352,9 +419,59 @@ class Calendar {
      * - Retorna objeto con: { totalEvents, eventsByCategory, upcomingEvents, busyDays }
      */
     getCalendarSummary() {
-        throw new Error('Method getCalendarSummary not implemented');
+        const totalEvents = this.events.length
+        const eventsByCategory = this.events.reduce((contador, eve) => {
+            const category = eve.getCategory()
+            contador[category] = (contador[category] || 0) + 1
+
+            return contador
+        }, {})
+        const upcomingEvents = this.getUpcomingEvents(7).length
+        const busyDays = this.getBusyDays().length
+
+        return {
+            totalEvents: totalEvents,
+            eventsByCategory: eventsByCategory,
+            upcomingEvents: upcomingEvents,
+            busyDays: busyDays
+        }
     }
 }
+
+// const event1 = new Event('cosas de la casa', 'una descripcion de pinga', new Date(), new Date(), 'alta')
+// const event2 = new Event('segundo evento', 'evento 2', new Date('2026-01-01'), new Date('2026-01-02'), 'media')
+// const event3 = new Event('segundo', 'evento 2', new Date('2026-02-10'), new Date('2026-10-02'), 'baja')
+// console.log(event1.getDuration())
+// console.log(event1.isAllDay())
+// console.log(event1)
+
+// const ArmandoCalendar = new Calendar('Armando')
+// console.log(ArmandoCalendar.addEvent(event1))
+// console.log(ArmandoCalendar.addEvent(event2))
+// console.log(ArmandoCalendar.addEvent(event3))
+// console.log(ArmandoCalendar.hasConflict(event3))
+// console.log(ArmandoCalendar.getUpcomingEvents(5))
+// console.log(ArmandoCalendar.getBusyDays())
+// console.log('/////////////////')
+// console.log('/////////////////')
+// console.log('/////////////////')
+// console.log('/////////////////')
+// console.log(ArmandoCalendar.getCalendarSummary())
+
+// const event = new Event('Test', 'Desc', new Date('2024-12-20T10:00:00'), new Date('2024-12-20T11:00:00'), 'Work');
+// const newStart = new Date('2024-12-21T14:00:00');
+// const newEnd = new Date('2024-12-21T15:00:00');
+// const result = event.updateTime(newStart, newEnd);
+
+const calendar = new Calendar('Juan Pérez');
+const event1 = new Event('Evento 1', 'Desc', new Date('2026-10-10'), new Date('2026-10-11'), 'Work');
+const event2 = new Event('Evento 2', 'Desc', new Date('2026-10-15'), new Date('2026-10-16'), 'Personal');
+calendar.addEvent(event1);
+calendar.addEvent(event2);
+const summary = calendar.getCalendarSummary();
+console.log(summary.eventsByCategory.Work)
+
+
 
 module.exports = {
     Event,

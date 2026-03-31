@@ -35,7 +35,11 @@ class BankAccount {
      * - Asigna los valores validados a this.accountHolder y this.balance
      */
     constructor(accountHolder, initialBalance = 0) {
-        throw new Error('BankAccount constructor not implemented');
+        if (accountHolder.trim() === '') throw new Error('Account holder name is required')
+        if (Number.isFinite(initialBalance) && initialBalance < 0) throw new Error('Initial balance cannot be negative')
+        this.accountHolder = accountHolder,
+            this.initialBalance = initialBalance,
+            this.balance = initialBalance
     }
 
     /**
@@ -56,7 +60,10 @@ class BankAccount {
      * - Retorna el nuevo saldo (this.balance)
      */
     deposit(amount) {
-        throw new Error('Method deposit not implemented');
+        if (!(amount > 0)) throw new Error('Deposit amount must be positive')
+
+        this.balance += amount
+        return this.balance
     }
 
     /**
@@ -79,7 +86,13 @@ class BankAccount {
      * - Retorna el nuevo saldo (this.balance)
      */
     withdraw(amount) {
-        throw new Error('Method withdraw not implemented');
+        if (amount <= 0) throw new Error('Withdrawal amount must be positive')
+        if (this.balance < amount) throw new Error('Insufficient funds')
+
+        this.balance -= amount
+        return this.balance
+
+
     }
 
     /**
@@ -95,7 +108,7 @@ class BankAccount {
      * - Retorna el valor de this.balance
      */
     getBalance() {
-        throw new Error('Method getBalance not implemented');
+        return this.balance
     }
 
     /**
@@ -114,9 +127,16 @@ class BankAccount {
      * - Retorna el string en el formato especificado
      */
     getAccountInfo() {
-        throw new Error('Method getAccountInfo not implemented');
+        const balanceFixed = this.balance.toFixed(2)
+        const stringReturn = `Account holder: ${this.accountHolder}, Balance: $${balanceFixed}`
+
+        return stringReturn
+
     }
 }
+
+const accountArmando = new BankAccount('Luisa Fernández', 1250)
+console.log(accountArmando.getAccountInfo())
 
 module.exports = {
     BankAccount

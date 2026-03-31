@@ -3,6 +3,8 @@
  * @description Ejercicio de gestión de tareas (TODOs) consumiendo una API.
  */
 
+// const { use } = require("react");
+
 /**
  * Obtiene todas las tareas de un usuario específico.
  * 
@@ -14,7 +16,12 @@
 async function fetchTodosByUser(userId) {
   // Tu código aquí
   // 1. Obtener datos de la API
+  const url = await fetch(`https://jsonplaceholder.typicode.com/todos?userId=${userId}`)
+  // console.log(url)
+  if (!url.ok) throw new Error(`hubo un error con la peticion error ${url.status}`);
+
   // 2. Retornar el array completo
+  return await url.json()
 }
 
 /**
@@ -25,8 +32,10 @@ async function fetchTodosByUser(userId) {
  */
 async function getCompletedTodos(userId) {
   // Tu código aquí
-  // 1. Llamar a fetchTodosByUser(userId)
+  // 1. Llamar a 
+  const arryTodo = await fetchTodosByUser(userId)
   // 2. Filtrar el resultado para obtener solo las tareas con completed: true
+  return arryTodo.filter(todo => todo.completed === true)
 }
 
 /**
@@ -38,7 +47,10 @@ async function getCompletedTodos(userId) {
 async function getPendingTodos(userId) {
   // Tu código aquí
   // 1. Llamar a fetchTodosByUser(userId)
+  const arryTodo = await fetchTodosByUser(userId)
+
   // 2. Filtrar el resultado para obtener solo las tareas con completed: false
+  return arryTodo.filter(todo => todo.completed === false)
 }
 
 /**
@@ -49,10 +61,16 @@ async function getPendingTodos(userId) {
  * Estructura del objeto: { total: number, completed: number, pending: number }
  */
 async function countTodosByStatus(userId) {
-  // Tu código aquí
-  // 1. Llamar a fetchTodosByUser(userId)
-  // 2. Calcular cuántas están completadas y cuántas pendientes
-  // 3. Retornar el objeto resumen
+  const todos = await fetchTodosByUser(userId);
+  
+  const completed = todos.filter(todo => todo.completed).length;
+  const pending = todos.filter(todo => !todo.completed).length;
+  
+  return {
+    total: todos.length,
+    completed,
+    pending
+  };
 }
 
 /**
@@ -69,8 +87,24 @@ async function countTodosByStatus(userId) {
 async function createTodo(userId, title) {
   // Tu código aquí
   // 1. Configurar la petición fetch con método POST
+  const url = await fetch(`https://jsonplaceholder.typicode.com/todos`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        title: title,
+        body: 'bar', // Este campo es opcional para este ejercicio, pero común en JSONPlaceholder
+        userId: userId,
+        completed: false // Estado inicial por defecto
+      }),
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+      },
+    })
   // 2. Incluir headers y body JSON
+  if (!url.ok) throw new Error(`hubo un problema del tipo ${url.status}`);
+
   // 3. Enviar la petición y retornar la respuesta
+  return await url.json()
 }
 
 module.exports = {
@@ -80,3 +114,10 @@ module.exports = {
   countTodosByStatus,
   createTodo
 };
+
+
+// fetchTodosByUser(1).then(a => console.log(a))
+// getCompletedTodos(1).then(a => console.log(a))
+// getPendingTodos(1).then(a => console.log(a))
+countTodosByStatus(1).then(a => console.log(a))
+// createTodo(1, 'cositas candelas').then(a => console.log(a))

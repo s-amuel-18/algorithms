@@ -1,5 +1,5 @@
 /**
- * Sistema de Biblioteca (Library System)
+ * Sistema de books (Library System)
  *
  * Descripción: Implementa dos clases básicas (`Book` y `Library`) para practicar
  * constructores, métodos de instancia, validaciones básicas y gestión de estado.
@@ -13,7 +13,7 @@
  */
 
 /**
- * Representa un libro en la biblioteca.
+ * Representa un libro en la books.
  * Traducción: Libro
  * @class
  */
@@ -36,8 +36,13 @@ class Book {
    * - Inicializa this.isAvailable = true (el libro está disponible por defecto)
    */
   constructor(title, author, isbn) {
-    throw new Error('Book constructor not implemented');
+    this.title = title,
+      this.author = author,
+      this.isbn = isbn,
+      this.isAvailable = true
+
   }
+
 
   /**
    * Alterna el estado de disponibilidad del libro.
@@ -53,35 +58,46 @@ class Book {
    * - Retorna el nuevo valor de this.isAvailable
    */
   toggleAvailability() {
-    throw new Error('Method toggleAvailability not implemented');
+    if (this.isAvailable) this.isAvailable = false
+    else this.isAvailable = true
   }
 }
 
+
+
+const libro1 = new Book('The Hobbit', 'J.R.R. Tolkien', '123')
+const libro2 = new Book('The ....', 'J.R.R. ', '12')
+const libro3 = new Book('The carrl', ' Tolkien', '13')
+
+
 /**
- * Gestiona la biblioteca y sus operaciones.
- * Traducción: Biblioteca
+ * Gestiona la books y sus operaciones.
+ * Traducción: books
  * @class
  */
 class Library {
   /**
    * Constructor de la clase Library
-   * Traducción: Constructor de Biblioteca
+   * Traducción: Constructor de books
    *
-   * Crea una nueva biblioteca.
+   * Crea una nueva books.
    * Inicializa un array vacío para libros.
    *
    * TODO:
    * - Inicializa this.books como un array vacío []
    */
+
+  books = []
+
   constructor() {
-    throw new Error('Library constructor not implemented');
+
   }
 
   /**
-   * Agrega un libro a la biblioteca.
+   * Agrega un libro a la books.
    * Traducción: Agregar Libro
    *
-   * Este método agrega un libro al array de libros de la biblioteca.
+   * Este método agrega un libro al array de libros de la books.
    *
    * @param {Book} book - Instancia de Book a agregar
    * @returns {Book} El libro agregado
@@ -91,7 +107,10 @@ class Library {
    * - Retorna el libro agregado
    */
   addBook(book) {
-    throw new Error('Method addBook not implemented');
+    if (!(book instanceof Book)) throw new Error('el elemnto no es instancia')
+    this.books.push(book)
+
+    return book
   }
 
   /**
@@ -109,11 +128,12 @@ class Library {
    * - Retorna el libro encontrado o undefined si no se encuentra
    */
   findBook(isbn) {
-    throw new Error('Method findBook not implemented');
+    const bookFound = this.books.find(books => books.isbn === isbn)
+    return bookFound
   }
 
   /**
-   * Presta un libro de la biblioteca.
+   * Presta un libro de la books.
    * Traducción: Prestar Libro
    *
    * Este método presta un libro si está disponible.
@@ -130,11 +150,15 @@ class Library {
    * - Retorna el libro prestado
    */
   borrowBook(isbn) {
-    throw new Error('Method borrowBook not implemented');
+    const searchBook = this.findBook(isbn)
+    if (searchBook === undefined) return null
+    if (searchBook instanceof Book && !searchBook.isAvailable) return null
+    if (searchBook instanceof Book) searchBook.toggleAvailability()
+    return searchBook
   }
 
   /**
-   * Devuelve un libro prestado a la biblioteca.
+   * Devuelve un libro prestado a la books.
    * Traducción: Devolver Libro
    *
    * Este método devuelve un libro prestado y lo marca como disponible.
@@ -150,8 +174,24 @@ class Library {
    * - Retorna el libro devuelto
    */
   returnBook(isbn) {
-    throw new Error('Method returnBook not implemented');
+    const searchBook = this.findBook(isbn)
+    console.log(searchBook)
+    if (searchBook === undefined) return null
+    if (searchBook.isAvailable) return null
+    if (!searchBook.isAvailable) searchBook.toggleAvailability()
+    return searchBook
   }
 }
+
+
+const books = new Library()
+books.addBook(libro1)
+books.addBook(libro2)
+books.addBook(libro3)
+
+console.log(books)
+console.log(books.findBook('123'))
+console.log(books.borrowBook('123'))
+console.log(books.returnBook('13'))
 
 module.exports = { Book, Library };

@@ -2,7 +2,7 @@
  * @file exercise.js
  * @description Ejercicio de consumo de API usando fetch y async/await.
  */
-
+// candela
 /**
  * Obtiene los detalles de un usuario desde la API.
  * 
@@ -15,6 +15,11 @@
 async function fetchUser(id) {
   // Tu código aquí
   // 1. Definir URL base: https://jsonplaceholder.typicode.com
+
+  const url = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`)
+  if (!url.ok) throw new Error("no se encontro lo solicitado POR EROOR " + url.status)
+
+  return await url.json()
   // 2. Hacer petición fetch a URL + /users/{id}
   // 3. Verificar si la respuesta es exitosa (response.ok)
   // 4. Si no es exitosa, lanzar un error
@@ -32,8 +37,12 @@ async function fetchUser(id) {
 async function fetchUserPosts(id) {
   // Tu código aquí
   // 1. Hacer petición fetch a URL + /posts?userId={id}
+  const url = await fetch(`https://jsonplaceholder.typicode.com/posts?userId=${id}`)
   // 2. Verificar si la respuesta es exitosa
+  if (!url.ok) throw new Error("hubo un error " + url.status);
+
   // 3. Retornar el JSON (array de posts)
+  return await url.json()
 }
 
 /**
@@ -57,8 +66,17 @@ async function fetchUserPosts(id) {
 async function getFormattedUserProfile(id) {
   // Tu código aquí
   // 1. Llamar a fetchUser(id)
+  const user = await fetchUser(id)
   // 2. Llamar a fetchUserPosts(id)
+  const posts = await fetchUserPosts(id)
   // 3. Extraer los datos necesarios
+  return {
+    id: id,
+    fullName: user.name,       // Usuario.name
+    email: user.email,          // Usuario.email
+    addressSummary: `${user.address.street}, ${user.address.city}`, // "Calle, Ciudad" (ej. "Kulas Light, Gwenborough")
+    totalPosts: posts.length      // Cantidad de posts del usuario
+  }
   // 4. Retornar el objeto con la estructura requerida
 }
 
@@ -67,3 +85,8 @@ module.exports = {
   fetchUserPosts,
   getFormattedUserProfile
 };
+
+
+// fetchUser(1).then((c) => console.log(c, '1'))
+// fetchUserPosts(1).then((c) => console.log(c.slice(0, 3), '2'))
+// getFormattedUserProfile(1).then((c) => console.log(c, '3'))

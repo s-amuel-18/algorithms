@@ -10,16 +10,42 @@
  * isPrime(2) => true
  * isPrime(1) => false
  */
+
+let num = 40
 function isPrime(num) {
-    // TODO: Implementa la función aquí
+    if (num <= 1) {
+        return false;
+    } else if (num === 2) {
+        return true
+    } else if (num % 2 != 0) {
+        let count = 0
+        for (let i = 1; i <= num; i++) {
+            // console.log(i)
+            if (num % i === 0) {
+                count++
+            }
+            // console.log(count)
+            if (count >= 3) {
+                return false
+            }
+        }
+        if (count === 2) {
+            return true
+        }else { 
+            return false
+        }
+    }
     
-    // Pista 1: Los números menores o iguales a 1 no son primos
-    // Pista 2: El 2 es el único número primo par
-    // Pista 3: Para números mayores que 2, si son pares no son primos
-    // Pista 4: Para números impares, verifica divisores hasta √num
-    // Pista 5: Usa el operador módulo (%) para verificar divisibilidad
     
-    return false;
+    return false
 }
 
+function result(){
+for(let i = 0 ; i<= num; i++){
+    let result=  isPrime(i)
+     console.log(`${i} es primo ? ${result}`)
+ }
+}
+result()
+isPrime(num)
 module.exports = isPrime;

@@ -243,7 +243,7 @@ describe('Validador de Expresiones Regulares', () => {
             // Propósito: Verificar que los errores tienen mensajes claros y útiles
             // Entrada: 123, "email" - Input que debe causar un error específico
             // Esperado: Mensaje de error específico y descriptivo
-            expect(() => validateRegex(123, "email")).toThrow(/string/i);
+            expect(() => validateRegex(123, "email")).toThrow('Text must be a string');
         });
 
         test('debe lanzar error con mensaje descriptivo cuando patternType no es válido', () => {

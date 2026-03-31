@@ -15,6 +15,7 @@ function formatMarkdown(text) {
     // TODO: Implementar la solución aquí
     
     // Pista 1: Valida que text sea un string
+    if(typeof text !== 'string' ) throw new Error("text is required");
     
     // Pista 2: Convierte negritas: **texto** o __texto__ → <strong>texto</strong>
     
@@ -28,7 +29,7 @@ function formatMarkdown(text) {
     
     // Pista 7: Usa expresiones regulares para encontrar y reemplazar patrones
     
-    throw new Error('Función no implementada');
+    // throw new Error('Función no implementada');
 }
 
 module.exports = formatMarkdown;

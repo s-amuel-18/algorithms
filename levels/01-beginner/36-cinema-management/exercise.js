@@ -1,17 +1,17 @@
 /**
- * Sistema de Gestión de Cine (Cinema Management System)
- *
- * Descripción: Implementa tres clases básicas (`Movie`, `Screening` y `Cinema`) para practicar
- * constructores, métodos de instancia, validaciones complejas, gestión de capacidad de salas,
- * cálculos de ingresos y relaciones entre múltiples clases.
- * Dificultad: BEGINNER
- *
- * Principios sugeridos:
- * - KISS: mantener el código simple y expresivo
- * - Validaciones Fail Fast: validar antes de continuar
- * - Responsabilidad Única: cada clase tiene un propósito claro
- * - Uso de métodos de arrays: find, filter, reduce
- */
+* Sistema de Gestión de Cine (Cinema Management System)
+*
+* Descripción: Implementa tres clases básicas (`Movie`, `Screening` y `Cinema`) para practicar
+* constructores, métodos de instancia, validaciones complejas, gestión de capacidad de salas,
+* cálculos de ingresos y relaciones entre múltiples clases.
+* Dificultad: BEGINNER
+*
+* Principios sugeridos:
+* - KISS: mantener el código simple y expresivo
+* - Validaciones Fail Fast: validar antes de continuar
+* - Responsabilidad Única: cada clase tiene un propósito claro
+* - Uso de métodos de arrays: find, filter, reduce
+*/
 
 /**
  * Representa una película.
@@ -43,7 +43,16 @@ class Movie {
      * - Asigna los valores validados a las propiedades correspondientes
      */
     constructor(title, duration, genre, rating) {
-        throw new Error('Movie constructor not implemented');
+        if (title.trim() === '' || typeof title !== 'string') throw new Error('Movie title is required')
+        if (duration <= 0) throw new Error('Movie duration must be greater than 0')
+        if (genre.trim() === '' || typeof genre !== 'string') throw new Error('Movie genre is required')
+        if (rating.trim() === '' || typeof rating !== 'string') throw new Error('Movie rating is required')
+
+        this.title = title
+        this.duration = duration
+        this.genre = genre
+        this.rating = rating
+
     }
 
     /**
@@ -56,7 +65,7 @@ class Movie {
      * - Retorna this.duration
      */
     getDuration() {
-        throw new Error('Method getDuration not implemented');
+        return this.duration
     }
 
     /**
@@ -69,7 +78,7 @@ class Movie {
      * - Retorna this.genre
      */
     getGenre() {
-        throw new Error('Method getGenre not implemented');
+        return this.genre
     }
 
     /**
@@ -82,7 +91,7 @@ class Movie {
      * - Retorna this.rating
      */
     getRating() {
-        throw new Error('Method getRating not implemented');
+        return this.rating
     }
 }
 
@@ -117,7 +126,16 @@ class Screening {
      * - Asigna los valores validados a las propiedades correspondientes
      */
     constructor(movie, room, startTime, ticketPrice) {
-        throw new Error('Screening constructor not implemented');
+        if (!(movie instanceof Movie)) throw new Error('Movie must be an instance of Movie')
+        if (room.trim() === '' || typeof room !== 'string') throw new Error('Room name is required')
+        if (!(startTime instanceof Date)) throw new Error('Start time must be a Date object')
+        if (ticketPrice <= 0) throw new Error('Ticket price must be greater than 0')
+
+        this.ticketsSold = 0
+        this.movie = movie
+        this.room = room
+        this.startTime = startTime
+        this.ticketPrice = ticketPrice
     }
 
     /**
@@ -138,7 +156,12 @@ class Screening {
      * - Retorna el número de asientos disponibles (no puede ser negativo, retorna 0 si es negativo)
      */
     getAvailableSeats(cinema) {
-        throw new Error('Method getAvailableSeats not implemented');
+        if (!(cinema instanceof Cinema)) throw new Error('Cinema must be an instance of Cinema')
+        const espacio = cinema.getRoomCapacity(this.room) - this.ticketsSold
+        if (espacio < 0) return 0
+        else return espacio
+
+
     }
 
     /**
@@ -161,7 +184,13 @@ class Screening {
      * - Retorna la cantidad de boletos vendidos
      */
     sellTickets(cinema, quantity) {
-        throw new Error('Method sellTickets not implemented');
+        if (quantity <= 0) throw new Error('Quantity must be greater than 0')
+        const espacios = this.getAvailableSeats(cinema)
+        console.log(espacios)
+        if (espacios <= 0 || quantity > espacios) throw new Error('Not enough seats available')
+        this.ticketsSold += quantity
+        return this.ticketsSold
+
     }
 
     /**
@@ -177,7 +206,7 @@ class Screening {
      * - Retorna el total de ingresos
      */
     getRevenue() {
-        throw new Error('Method getRevenue not implemented');
+        return this.ticketPrice * this.ticketsSold
     }
 
     /**
@@ -194,7 +223,9 @@ class Screening {
      * - Retorna true si los asientos disponibles son 0, false en caso contrario
      */
     isFull(cinema) {
-        throw new Error('Method isFull not implemented');
+        const full = this.getAvailableSeats(cinema)
+        if (full === 0) return true
+        else return false
     }
 
     /**
@@ -212,7 +243,11 @@ class Screening {
      * - Retorna la fecha de finalización
      */
     getEndTime() {
-        throw new Error('Method getEndTime not implemented');
+        const inicio = new Date(this.startTime)
+        console.log(inicio)
+        const final = inicio.getMinutes() + this.movie.duration
+        inicio.setMinutes(final)
+        return inicio
     }
 }
 
@@ -243,7 +278,14 @@ class Cinema {
      * - Asigna los valores validados a this.name y this.totalSeats
      */
     constructor(name, totalSeats) {
-        throw new Error('Cinema constructor not implemented');
+        if (name.trim() === '' || typeof name !== 'string') throw new Error('Cinema name is required')
+        if (totalSeats <= 0) throw new Error('Total seats must be greater than 0')
+
+        this.movies = []
+        this.screenings = []
+        this.roomCapacities = {}
+        this.name = name
+        this.totalSeats = totalSeats
     }
 
     /**
@@ -262,7 +304,9 @@ class Cinema {
      * - Retorna la película agregada
      */
     addMovie(movie) {
-        throw new Error('Method addMovie not implemented');
+        if (!(movie instanceof Movie)) throw new Error('Movie must be an instance of Movie')
+        this.movies.push(movie)
+        return movie
     }
 
     /**
@@ -284,7 +328,10 @@ class Cinema {
      * - Retorna true
      */
     setRoomCapacity(roomName, capacity) {
-        throw new Error('Method setRoomCapacity not implemented');
+        if (roomName.trim() === '' || typeof roomName !== 'string') throw new Error('Room name is required')
+        if (capacity <= 0) throw new Error('Room capacity must be greater than 0')
+        this.roomCapacities[roomName] = capacity
+        return true
     }
 
     /**
@@ -300,7 +347,12 @@ class Cinema {
      * - Retorna this.roomCapacities[roomName] si existe, o 0 si no existe
      */
     getRoomCapacity(roomName) {
-        throw new Error('Method getRoomCapacity not implemented');
+        if (Object.keys(this.roomCapacities).includes(roomName)) {
+            return this.roomCapacities[roomName]
+
+        } else return 0
+
+
     }
 
     /**
@@ -321,7 +373,9 @@ class Cinema {
      * - Retorna la proyección creada
      */
     createScreening(movie, room, startTime, ticketPrice) {
-        throw new Error('Method createScreening not implemented');
+        const newScreening = new Screening(movie, room, startTime, ticketPrice)
+        this.screenings.push(newScreening)
+        return newScreening
     }
 
     /**
@@ -340,7 +394,8 @@ class Cinema {
      * - Retorna el nuevo array filtrado
      */
     getScreeningsByMovie(movieTitle) {
-        throw new Error('Method getScreeningsByMovie not implemented');
+        const proyecciones = this.screenings.filter(pro => pro.movie.title === movieTitle)
+        return proyecciones
     }
 
     /**
@@ -361,7 +416,10 @@ class Cinema {
      * - Retorna el nuevo array filtrado
      */
     getScreeningsByDate(date) {
-        throw new Error('Method getScreeningsByDate not implemented');
+        if (!(date instanceof Date)) throw new Error('Date must be a Date object')
+        console.log(date)
+
+        return this.screenings.filter(pro => pro.startTime.getDate() - 1 === date.getDate() && pro.startTime.getMonth() === date.getMonth() && pro.startTime.getFullYear() === date.getFullYear())
     }
 
     /**
@@ -380,7 +438,10 @@ class Cinema {
      * - Si no hay proyecciones, retorna 0
      */
     getTotalRevenue() {
-        throw new Error('Method getTotalRevenue not implemented');
+        if (this.screenings.length === 0) return 0
+        return this.screenings.reduce((contador, pago) => {
+            return contador + (pago.getRevenue())
+        }, 0)
     }
 
     /**
@@ -399,9 +460,34 @@ class Cinema {
      * - Si hay empate, retorna la primera encontrada
      */
     getMostPopularMovie() {
-        throw new Error('Method getMostPopularMovie not implemented');
+        if (this.screenings.length === 0) return null
+        let count = 0
+        let nameMovie = ''
+        for (let sold of this.screenings) {
+            if (sold.ticketsSold > count) {
+                count = sold.ticketsSold
+                nameMovie = sold.movie.title
+            }
+        }
+
+        return nameMovie
     }
 }
+
+const cinema = new Cinema('CineMax', 500);
+const movie1 = new Movie('Avengers', 180, 'Action', 'PG-13');
+const movie2 = new Movie('Titanic', 195, 'Drama', 'PG-13');
+cinema.addMovie(movie1);
+cinema.addMovie(movie2);
+cinema.setRoomCapacity('Sala 1', 100);
+const screening1 = cinema.createScreening(movie1, 'Sala 1', new Date(), 12.50);
+const screening2 = cinema.createScreening(movie2, 'Sala 1', new Date(), 10.00);
+screening1.sellTickets(cinema, 80); // Más boletos
+screening2.sellTickets(cinema, 50);
+console.log(screening1)
+console.log(screening2)
+console.log(cinema)
+console.log(cinema.getMostPopularMovie())
 
 module.exports = {
     Movie,

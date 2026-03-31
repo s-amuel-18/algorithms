@@ -33,7 +33,26 @@
  * - Si random >= successRate → reject(new Error("API call failed"))
  */
 function simulateApiCall(successRate = 0.8) {
-    throw new Error('Function simulateApiCall not implemented');
+    if (typeof successRate !== 'number') return Promise.reject(new Error('Success rate must be a number'))
+    if (successRate > 1 || successRate < 0) return Promise.reject(new Error('Success rate must be between 0 and 1'))
+
+    let count = 0
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const random = Math.random();
+
+            if (random < successRate) {
+                resolve('Success');
+                console.log('Succes')
+
+            } else {
+                reject(new Error('API call failed'));
+                console.log('APY call falled')
+            }
+        }, 200);
+    });
+
+
 }
 
 /**
@@ -58,7 +77,15 @@ function simulateApiCall(successRate = 0.8) {
  * - Si falla y maxRetries <= 0, rechaza con el error
  */
 function retryOperation(operation, maxRetries = 3) {
-    throw new Error('Function retryOperation not implemented');
+    if (typeof operation !== 'function') return Promise.reject(new Error('Operation must be a function'))
+    if (typeof maxRetries !== 'number') return Promise.reject(new Error('Max retries must be a number'))
+    if (maxRetries < 0) return Promise.reject(new Error('Max retries must be greater than or equal to 0'))
+
+    return operation().catch(error => {
+        if (maxRetries <= 0) throw error
+
+        return retryOperation(operation, maxRetries - 1)
+    })
 }
 
 /**
@@ -82,7 +109,18 @@ function retryOperation(operation, maxRetries = 3) {
  * - Retorna el resultado de Promise.race()
  */
 function withTimeout(promise, timeoutMs = 5000) {
-    throw new Error('Function withTimeout not implemented');
+    if (!(promise instanceof Promise)) return Promise.reject(new Error('Promise must be a Promise instance'))
+    if (typeof timeoutMs !== 'number') return Promise.reject(new Error('Timeout must be a number'))
+    if (timeoutMs <= 0) return Promise.reject(new Error('Timeout must be greater than 0'))
+
+    const validationTime = new Promise((resolve, reject) => {
+        setTimeout(() => {
+            reject(new Error('Operation timed out'))
+        }, timeoutMs);
+    })
+
+
+    return Promise.race([promise, validationTime])
 }
 
 /**
@@ -108,7 +146,20 @@ function withTimeout(promise, timeoutMs = 5000) {
  * - Retorna el resultado de retryOperation()
  */
 function fetchWithRetry(url, maxRetries = 3) {
-    throw new Error('Function fetchWithRetry not implemented');
+
+    const validation = [null, undefined, '']
+    if (validation.includes(url)) return Promise.reject(new Error('URL is required'))
+    // if (typeof url !== 'string') return Promise.reject(new Error('URL is required'))
+    if (typeof maxRetries !== 'number') return Promise.reject(new Error('Max retries must be a number'))
+    if (maxRetries < 0) return Promise.reject(new Error('max retries must be greater than or equa to 0'))
+
+    const operationn = () => {
+        return withTimeout(simulateApiCall(0.6), 1000).then(() => {
+            return 'Data from ' + url
+        })
+    }
+
+    return retryOperation(operationn, maxRetries)
 }
 
 /**
@@ -131,8 +182,31 @@ function fetchWithRetry(url, maxRetries = 3) {
  * - Retorna el array filtrado y mapeado
  */
 function processMultipleRequests(urls) {
-    throw new Error('Function processMultipleRequests not implemented');
+    if (!(Array.isArray(urls))) return Promise.reject(new Error('URLs must be an array'))
+    if (urls.length === 0) return Promise.reject(new Error('URLs array cannot be empty'))
+
+    const arryPromises = urls.map(url => {
+        return fetchWithRetry(url)
+    })
+
+    console.log('/////////')
+    console.log(arryPromises, 'AQUI')
+    console.log('/////////')
+
+
+    const arryAnalise = Promise.allSettled(arryPromises).then((obj) => {
+        return obj.filter(obj2 => obj2.status === 'fulfilled').map(obj3 => obj3.value)
+    })
+
+    return arryAnalise
 }
+
+// const chequeo = simulateApiCall()
+// // console.log(chequeo)
+// const a = await fetchWithRetry('www.google.com', 5)
+// console.log( processMultipleRequests(['www.google.com', 'www.amazon.com', 'www.avimark.com']))
+
+
 
 module.exports = {
     simulateApiCall,
